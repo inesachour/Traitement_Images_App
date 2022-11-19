@@ -1,4 +1,5 @@
 
+import 'dart:collection';
 import 'dart:io';
 import 'dart:math';
 
@@ -148,8 +149,11 @@ class ImagesService{
   }
 
 
-  PGMImage modifyContrastPGM(PGMImage img){
-    Map<int,int> points = {0:0,50:100, 60:10, 150:200, 255:255};
+  PGMImage modifyContrastPGM(PGMImage img, Map<int,int> points){
+
+
+
+    points = {0:0,50:100, 60:10, 150:200, 255:255};
 
     List<int> newPixels = List.filled(img.maxValue+1,0);
     Map<double,double> fn;

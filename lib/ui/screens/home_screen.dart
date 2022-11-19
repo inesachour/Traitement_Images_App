@@ -1,10 +1,13 @@
-import 'package:auto_size_text/auto_size_text.dart';
+// ignore_for_file: prefer_function_declarations_over_variables
+
+import 'dart:collection';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
+import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/general_info_widgets.dart';
 import 'package:traitement_image/ui/widgets/main_buttons.dart';
@@ -18,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var image;
-  PGMImage? secondImage = null;
+  PGMImage? contrastedImage = null;
 
 
 
@@ -26,7 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
 
-    // ignore: prefer_function_declarations_over_variables
+    double deviceWidth = MediaQuery.of(context).size.width;
+    double deviceHeight = MediaQuery.of(context).size.height;
+
     VoidCallback onReadImageClick = () async {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
       if (result != null) {
@@ -37,13 +42,11 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         else if(extension == "pgm"){
           image = await ImagesService().readPGM(result.files.single.path!);
-          secondImage = ImagesService().modifyContrastPGM(image);
         }
         setState((){});
       }
     };
 
-    // ignore: prefer_function_declarations_over_variables
     VoidCallback onWriteImageClick = () async {
       if(image.runtimeType == PPMImage){
         ImagesService().writePPM(image, "D:\\Users\\Ines\\Desktop\\exemple2.ppm"); //TODO change path
@@ -53,8 +56,17 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     };
 
-    double deviceWidth = MediaQuery.of(context).size.width;
-    double deviceHeight = MediaQuery.of(context).size.height;
+    VoidCallback onModifyContrastClick = () async {
+      Map<int,int>? value = await showDialog(context: context, builder: (context) => ModifyContractPopup());
+      if(value != null){
+        value.forEach((key, value) { print("${key} : ${value}");});
+        Map<int,int> sortedByKeyMap = Map.fromEntries(
+            value.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
+        contrastedImage = ImagesService().modifyContrastPGM(image, sortedByKeyMap);
+      }
+    };
+
+
 
     return SafeArea(
       child: Scaffold(
@@ -78,6 +90,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     enabled: image != null,
                   ),
 
+                  mainButton(
+                    title: "Modifier Contrast",
+                    onPressed: onModifyContrastClick,
+                    enabled: image != null && image.runtimeType == PGMImage,
+                  ),
+
                 ],
               ),
             ),
@@ -94,9 +112,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: deviceWidth*0.2,
                         title: "Histogramme"
                       ),
-                      if(secondImage != null)
+                      if(contrastedImage != null)
                       histogramChart(
-                          data: ImagesService().histogrammePGM(secondImage!).asMap(),
+                          data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
                           barWidth: 4,
                           width: deviceWidth*0.7,
                           height: deviceWidth*0.2,
