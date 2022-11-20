@@ -61,7 +61,7 @@ class ImagesService{
   }
 
   void writePGM(PGMImage img, String path) async {
-    final File file = File(path);
+    final File file = File("$path.pgm");
     String text = "P2\n# commentaire\n${img.ly} ${img.lx}\n${img.maxValue}";
     for(int row =0 ; row < img.lx; row++){
       text += "\n";
@@ -77,7 +77,7 @@ class ImagesService{
   }
 
   void writePPM(PPMImage img, String path) async {
-    final File file = File(path);
+    final File file = File("$path.ppm");
     String text = "P3\n# commentaire\n${img.ly} ${img.lx}\n${img.maxValue}";
     for(int row =0 ; row < img.lx; row++){
       text += "\n";
@@ -149,21 +149,25 @@ class ImagesService{
   }
 
 
-  PGMImage modifyContrastPGM(PGMImage img, Map<int,int> points){
+  PGMImage modifyContrastPGM(PGMImage img, Map<int,int> points, String path){
+    if(!points.keys.contains(0)) points.addAll({0:0});
+    if(!points.keys.contains(img.maxValue)) points.addAll({img.maxValue : img.maxValue});
 
+    //Trier Map des points
+    Map<int,int> sortedByKeyMap = Map.fromEntries(
+        points.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
 
-
-    points = {0:0,50:100, 60:10, 150:200, 255:255};
-
+    //LUT
     List<int> newPixels = List.filled(img.maxValue+1,0);
     Map<double,double> fn;
-    for(int j =0;j<points.length-1;j++){
-      fn = newPoint(points.keys.elementAt(j), points.values.elementAt(j), points.keys.elementAt(j+1), points.values.elementAt(j+1));
-      for(int i=points.keys.elementAt(j);i<=points.keys.elementAt(j+1);i++){
+    for(int j =0;j<sortedByKeyMap.length-1;j++){
+      fn = newPoint(sortedByKeyMap.keys.elementAt(j), sortedByKeyMap.values.elementAt(j), sortedByKeyMap.keys.elementAt(j+1), sortedByKeyMap.values.elementAt(j+1));
+      for(int i=sortedByKeyMap.keys.elementAt(j);i<=sortedByKeyMap.keys.elementAt(j+1);i++){
         newPixels[i] = (fn.keys.first * i + fn.values.first).ceil();
       }
     }
 
+    //Creation de l'image modifié
     PGMImage img2 = PGMImage.clone(img);
     img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
 
@@ -172,9 +176,10 @@ class ImagesService{
         img2.mat[row][col] = newPixels[img2.mat[row][col]];
       }
     }
-    writePGM(img2, "D:\\Users\\Ines\\Desktop\\new.pgm");
+    writePGM(img2, path);
     return img2;
   }
+
 
    Map<double,double> newPoint(int x0, int y0, int x1, int y1){
     double a = (y1-y0)/(x1-x0);

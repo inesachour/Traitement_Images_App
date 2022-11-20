@@ -48,21 +48,31 @@ class _HomeScreenState extends State<HomeScreen> {
     };
 
     VoidCallback onWriteImageClick = () async {
-      if(image.runtimeType == PPMImage){
-        ImagesService().writePPM(image, "D:\\Users\\Ines\\Desktop\\exemple2.ppm"); //TODO change path
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: 'Enregister l\'image dans',
+        fileName: "export",
+      );
+      if(outputFile != null){
+        if(image.runtimeType == PPMImage){
+          ImagesService().writePPM(image, outputFile);
+        }
+        else if(image.runtimeType == PGMImage){
+          ImagesService().writePGM(image, outputFile);
+        }
       }
-      else if(image.runtimeType == PGMImage){
-        ImagesService().writePGM(image, "D:\\Users\\Ines\\Desktop\\exemple2.pgm"); //TODO change path
-      }
+
     };
 
     VoidCallback onModifyContrastClick = () async {
       Map<int,int>? value = await showDialog(context: context, builder: (context) => ModifyContractPopup());
       if(value != null){
-        value.forEach((key, value) { print("${key} : ${value}");});
-        Map<int,int> sortedByKeyMap = Map.fromEntries(
-            value.entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
-        contrastedImage = ImagesService().modifyContrastPGM(image, sortedByKeyMap);
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "modified_contrast",
+        );
+        if(outputFile != null) {
+          contrastedImage = ImagesService().modifyContrastPGM(image, value,outputFile);
+        }
       }
     };
 
@@ -86,13 +96,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   mainButton(
                     title: "Ecrire Image",
-                    onPressed: onWriteImageClick,
+                    onPressed: image != null ? onWriteImageClick : null,
                     enabled: image != null,
                   ),
 
                   mainButton(
                     title: "Modifier Contrast",
-                    onPressed: onModifyContrastClick,
+                    onPressed: image != null && image.runtimeType == PGMImage ? onModifyContrastClick : null,
                     enabled: image != null && image.runtimeType == PGMImage,
                   ),
 
