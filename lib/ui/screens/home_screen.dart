@@ -44,6 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
           image = await ImagesService().readPGM(result.files.single.path!);
         }
         setState((){});
+
+        ImagesService().bruit(image, "D:\\Users\\Ines\\Desktop\\bruit");
+        ImagesService().filtrerMoyenneur(image,3,"D:\\Users\\Ines\\Desktop\\f_moy");
       }
     };
 

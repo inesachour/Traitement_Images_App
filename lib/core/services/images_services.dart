@@ -187,4 +187,51 @@ class ImagesService{
     return {a:b};
   }
 
+  PGMImage bruit(PGMImage img, String path){
+    int r;
+    var rng = Random();
+    PGMImage img2 = PGMImage.clone(img);
+    img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
+    for (int row = 0; row < img2.lx; row++) {
+      for (int col = 0; col < img2.ly; col++) {
+        r = rng.nextInt(21);
+        if(r==0) img2.mat[row][col] = 0;
+        else if(r== img2.maxValue) img2.mat[row][col] = img2.maxValue;
+      }
+    }
+    writePGM(img2, path);
+    return img2;
+  }
+
+  PGMImage filtrerMoyenneur(PGMImage img, int n, String path){
+
+    PGMImage img2 = PGMImage.clone(img);
+    img2.mat =List.filled(img.lx, List.filled(img.ly,0));// img.mat.map((item) => item.map((e) => e).toList()).toList();
+
+    List<List<int>> nvMat = List.filled(img.lx+ n-1, List.filled(img.ly+n-1,0));
+
+    for(int i = (n/2).ceil(); i < img.lx+(n/2).ceil(); i++){
+      for(int j = (n/2).ceil(); j < img.ly+(n/2).ceil(); j++){
+        nvMat[i][j] = img.mat[i- (n/2).ceil()][j -(n/2).ceil()];
+      }
+    }
+
+    int s=0;
+    for (int row = 0; row < img2.lx; row++) {
+      for (int col = 0; col < img2.ly; col++) {
+        s=0;
+        for(int i = row; i< row+n;i++){
+          for(int j = col; j< col+n;j++){
+            if (i==0)
+            print(nvMat[i][j]);
+            s += nvMat[i][j];
+          }
+        }
+        img2.mat[row][col] = (s/(n*n)).ceil();
+      }
+    }
+
+    writePGM(img2, path);
+    return img2;
+  }
 }
