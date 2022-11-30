@@ -1,5 +1,4 @@
 
-import 'dart:collection';
 import 'dart:io';
 import 'dart:math';
 
@@ -181,7 +180,7 @@ class ImagesService{
   }
 
 
-   Map<double,double> newPoint(int x0, int y0, int x1, int y1){
+  Map<double,double> newPoint(int x0, int y0, int x1, int y1){
     double a = (y1-y0)/(x1-x0);
     double b = y1 - a*x1;
     return {a:b};
@@ -195,43 +194,165 @@ class ImagesService{
     for (int row = 0; row < img2.lx; row++) {
       for (int col = 0; col < img2.ly; col++) {
         r = rng.nextInt(21);
-        if(r==0) img2.mat[row][col] = 0;
-        else if(r== img2.maxValue) img2.mat[row][col] = img2.maxValue;
+        if(r==0) {
+          img2.mat[row][col] = 0;
+        } else if(r== 20) {
+          img2.mat[row][col] = img2.maxValue;
+        }
       }
     }
     writePGM(img2, path);
     return img2;
   }
 
-  PGMImage filtrerMoyenneur(PGMImage img, int n, String path){
+  PGMImage filtreMoyenneur(PGMImage img, int n, String path){
 
     PGMImage img2 = PGMImage.clone(img);
-    img2.mat =List.filled(img.lx, List.filled(img.ly,0));// img.mat.map((item) => item.map((e) => e).toList()).toList();
+    img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
 
-    List<List<int>> nvMat = List.filled(img.lx+ n-1, List.filled(img.ly+n-1,0));
+    int x = (n/2).floor();
 
-    for(int i = (n/2).ceil(); i < img.lx+(n/2).ceil(); i++){
-      for(int j = (n/2).ceil(); j < img.ly+(n/2).ceil(); j++){
-        nvMat[i][j] = img.mat[i- (n/2).ceil()][j -(n/2).ceil()];
-      }
-    }
-
-    int s=0;
-    for (int row = 0; row < img2.lx; row++) {
-      for (int col = 0; col < img2.ly; col++) {
-        s=0;
-        for(int i = row; i< row+n;i++){
-          for(int j = col; j< col+n;j++){
-            if (i==0)
-            print(nvMat[i][j]);
-            s += nvMat[i][j];
+    for(int row =0; row <img.lx; row++){
+      for (int col = 0; col < img.ly; col++) {
+        int s=0;
+        for(int i = row-x; i<= row+x;i++) {
+          for (int j = col-x; j <= col+x; j++) {
+            if((i>=0 && j>=0) && (i<img.lx && j<img.ly)){
+              s+= img.mat[i][j];
+            }
           }
         }
-        img2.mat[row][col] = (s/(n*n)).ceil();
+        img2.mat[row][col] = (s/(n*n)).floor();
       }
     }
 
     writePGM(img2, path);
+    return img2;
+  }
+
+  PGMImage filtreMedian(PGMImage img, int n, bool square,String path){
+
+    PGMImage img2 = PGMImage.clone(img);
+    img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
+
+    int x = (n/2).floor();
+
+    for(int row =0; row <img.lx; row++){
+      for (int col = 0; col < img.ly; col++) {
+        List<int> pixels = [];
+        if(square){
+          for(int i = row-x; i<= row+x;i++) {
+            for (int j = col-x; j <= col+x; j++) {
+              if((i>=0 && j>=0) && (i<img.lx && j<img.ly)){
+                pixels.add(img.mat[i][j]);
+              }
+              else{
+                pixels.add(0);
+              }
+            }
+          }
+        }
+        else{
+          for(int i = -x; i <= x; i++) {
+            if(i!=0){
+              if(row+i<img.lx && row+i>=0){
+                pixels.add(img.mat[row+i][col]);
+              }
+              else{
+                pixels.add(0);
+              }
+
+              if(col+i<img.ly && col+i>=0){
+                pixels.add(img.mat[row][col+i]);
+              }
+              else{
+                pixels.add(0);
+              }
+            }
+          }
+          pixels.add(img.mat[row][col]);
+        }
+        pixels.sort();
+        img2.mat[row][col] = pixels[(pixels.length/2).floor()];
+      }
+    }
+
+    writePGM(img2, path);
+    return img2;
+  }
+
+  PGMImage filtreConvolution(PGMImage img, List<List<int>> masque, String path){
+    PGMImage img2 = PGMImage.clone(img);
+    img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
+
+    int x = (masque.length/2).floor();
+    int s = 0;
+
+    for(int row =0; row <img.lx; row++) {
+      for (int col = 0; col < img.ly; col++) {
+        for(int i = -x; i<= x;i++) {
+          for (int j = -x; j <= x; j++) {
+            if((row+i>=0 && col+j>=0) && (row+i<img.lx && col+j<img.ly)){
+              s += img.mat[row+i][col+j]*masque[i+x][j+x];
+            }
+          }
+        }
+        int val = s.abs().floor();
+        img2.mat[row][col] = val > img.maxValue ? img.maxValue : val;
+        s=0;
+      }
+    }
+    writePGM(img2, path);
+    return img2;
+  }
+
+  PGMImage filtreHighBoost(PGMImage img, PGMImage imgFiltre ,String path){ //TODO USER CHOOSE WHICH FILTER TO YA3MEL
+    PGMImage img2 = PGMImage.clone(img);
+    img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
+    for(int row =0; row <img.lx; row++) {
+      for (int col = 0; col < img.ly; col++) {
+        int val = (img.mat[row][col] - imgFiltre.mat[row][col]);
+        img2.mat[row][col] = val < 0 ? 0 : val;
+      }
+    }
+    writePGM(img2, path);
+    return img2;
+  }
+
+  double signalBruit(PGMImage original, PGMImage traite){
+    double moy = moyennePGM(original);
+    double x =0, y=0;
+
+    for(int row =0; row <original.lx; row++){
+      for (int col = 0; col < original.ly; col++) {
+        x += pow(original.mat[row][col]-moy,2);
+        y += pow(traite.mat[row][col] - original.mat[row][col],2);
+      }
+    }
+    return sqrt(x/y);
+  }
+
+  PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path){
+    PPMImage img2 = PPMImage.clone(img);
+    img2.r = img.r.map((e)=>e).toList();
+    img2.g = img.g.map((e)=>e).toList();
+    img2.b = img.b.map((e)=>e).toList();
+
+    for(int row =0; row <img.lx; row++){
+      for (int col = 0; col < img.ly; col++) {
+        int x = row*img.lx + col;
+        if(  option == 0
+            || (option == 1 && !(img.r[x] > seuils[0] && img.g[x] > seuils[1] && img.b[x] > seuils[2]))
+            || (option == 2 && !(img.r[x] > seuils[0] || img.g[x] > seuils[1] || img.b[x] > seuils[2]))
+        ){
+          img2.r[x] = (img.r[x] > seuils[0]) ? img2.maxValue : 0;
+          img2.g[x] = (img.g[x] > seuils[1]) ? img2.maxValue : 0;
+          img2.b[x] = (img.b[x] > seuils[2]) ? img2.maxValue : 0;
+        }
+      }
+    }
+
+    writePPM(img2, path);
     return img2;
   }
 }
