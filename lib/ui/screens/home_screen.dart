@@ -2,16 +2,18 @@
 
 import 'dart:collection';
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:expandable/expandable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
-import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
-import 'package:traitement_image/ui/widgets/general_info_widgets.dart';
-import 'package:traitement_image/ui/widgets/menu_buttons.dart';
+import 'package:traitement_image/ui/widgets/footer_widgets.dart';
+import 'package:traitement_image/ui/widgets/menu_widgets.dart';
+import 'package:traitement_image/ui/widgets/tools_bar_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   PGMImage? contrastedImage = null;
   ImagesService imagesService = ImagesService();
   AlertsService alertsService = AlertsService();
+  int toolPanelSelected = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         //imagesService.filtreHighBoost(image, j, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\f_highboost");
 
-        imagesService.seuillageManuel(image, [10,10,10], 2, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuil");
+        //imagesService.seuillageManuel(image, [10,10,10], 2, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuil");
 
 
       }
@@ -83,119 +86,119 @@ class _HomeScreenState extends State<HomeScreen> {
 
     };
 
-    VoidCallback onModifyContrastClick = () async {
-      Map<int,int>? value = await showDialog(context: context, builder: (context) => ModifyContractPopup());
-      if(value != null){
-        String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Enregister l\'image dans',
-          fileName: "modified_contrast",
-        );
-        if(outputFile != null) {
-          contrastedImage = imagesService.modifyContrastPGM(image, value,outputFile);
-        }
+    Function onModifyContrastClick = (Map<int,int> points) async {
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: 'Enregister l\'image dans',
+        fileName: "modified_contrast",
+      );
+      if(outputFile != null) {
+        contrastedImage = imagesService.modifyContrastPGM(image, points,outputFile);
       }
     };
 
+    Function onOptionSelected = (int i) {
+      setState((){
+        if(toolPanelSelected == i){
+          toolPanelSelected = 0;
+        }
+        else{
+          toolPanelSelected = i;
+        }
+      });
+    };
 
 
     return SafeArea(
       child: Scaffold(
-        body: Column(
+        body: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Container(
-              width: deviceWidth,
-              height: deviceHeight*0.1,
-              color: Colors.blue,
-              child: Row(
-                children: [
 
-                  SizedBox(width: deviceWidth*0.02,),
-
-                  menuDropDownButton(
-                    title: "Fichier",
-                    deviceWidth: deviceWidth,
-                    onChanged: [onReadImageClick, onWriteImageClick],
-                    options: ["Lire", "Ecrire"],
-                  ),
-
-                  SizedBox(width: deviceWidth*0.02,),
-
-                  menuDropDownButton( //TODO
-                    title: "Modification",
-                    deviceWidth: deviceWidth,
-                    onChanged: image != null && image.runtimeType == PGMImage ? [onModifyContrastClick] : null,
-                    options: ["Modifier le contrast", "Filtre Moyenneur", "Filtre Median", "Filtre Convolution", "Filtre High Boost"],
-                    enabled: image != null
-                  ),
-
-                ],
-              ),
+            //Footer Bar
+            footerBar(
+              deviceHeight: deviceHeight,
+              deviceWidth: deviceWidth,
+              moyenne: image != null ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
+              ecartType: image != null ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
+              show: image != null && image.runtimeType == PGMImage ,
             ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
 
-                if(image != null && image.runtimeType == PGMImage)
-                  Expanded(
-                    child: SingleChildScrollView(
+                //Menu
+                menuBar(
+                  deviceWidth: deviceWidth,
+                  deviceHeight: deviceHeight,
+                  onChanged: [[onReadImageClick, onWriteImageClick]],
+                  options : [["Lire une image", "Ecrire une image"]],
+                ),
+
+                //Screen
+                Row(
+                  children: [
+                    Container(
+                      width: deviceWidth*0.2,
                       child: Column(
                         children: [
-                          histogramChart(
-                            data: ImagesService().histogrammePGM(image).asMap(),
-                            barWidth: 4,
-                            width: deviceWidth*0.7,
-                            height: deviceWidth*0.2,
-                            title: "Histogramme"
+
+                          toolBar(
+                            deviceWidth: deviceWidth,
+                            onOptionSelected:
+                            onOptionSelected, selected: toolPanelSelected,
                           ),
-                          //if(contrastedImage != null)
-                          /*histogramChart(
-                              data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
-                              barWidth: 4,
-                              width: deviceWidth*0.7,
-                              height: deviceWidth*0.2,
-                              title: "Histogramme Apres modification de Contrast"
-                          ),*/
 
-                          /*histogramChart(
-                              data: ImagesService().histogrammeCumulePGM(image).asMap(),
-                              barWidth: 4,
-                              width: deviceWidth,
-                              height: deviceWidth*0.4,
-                              title: "Histogramme Cumulé"
-                          ),*/
+                          if(toolPanelSelected == 1)
+                          ModifyContract(onModifyContrast: onModifyContrastClick),
 
-                          /*histogramChart(
-                              data: ImagesService().histogrammeEgalisePGM(image).asMap(),
-                              barWidth: 4,
-                              width: deviceWidth,
-                              height: deviceWidth*0.4,
-                              title: "Histogramme Egalisé"
-                          ),*/
+
                         ],
                       ),
                     ),
-                  ),
 
+                    //Graphs
+                    if(image != null && image.runtimeType == PGMImage)
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
 
-                Container(
-                  height: deviceHeight *0.9,
-                  width: deviceWidth*0.1,
-                  color: Colors.blueGrey,
-                  child: Column(
-                    children: [
-                      imageInfo(
-                        title: "Moyenne",
-                        value: image != null && image.runtimeType == PGMImage ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null, //TODO NULL IF NO PGM
+                              /*histogramChart(
+                              data: ImagesService().histogrammePGM(image).asMap(),
+                              barWidth: 4,
+                              width: deviceWidth*0.7,
+                              height: deviceWidth*0.2,
+                              title: "Histogramme"
+                          ),*/
+                              //if(contrastedImage != null)
+                              /*histogramChart(
+                                  data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
+                                  barWidth: 4,
+                                  width: deviceWidth*0.7,
+                                  height: deviceWidth*0.2,
+                                  title: "Histogramme Apres modification de Contrast"
+                              ),*/
+
+                              /*histogramChart(
+                                  data: ImagesService().histogrammeCumulePGM(image).asMap(),
+                                  barWidth: 4,
+                                  width: deviceWidth,
+                                  height: deviceWidth*0.4,
+                                  title: "Histogramme Cumulé"
+                              ),*/
+
+                              /*histogramChart(
+                                  data: ImagesService().histogrammeEgalisePGM(image).asMap(),
+                                  barWidth: 4,
+                                  width: deviceWidth,
+                                  height: deviceWidth*0.4,
+                                  title: "Histogramme Egalisé"
+                              ),*/
+                            ],
+                          ),
+                        ),
                       ),
-
-                      imageInfo(
-                        title: "Ecart Type",
-                        value: image != null && image.runtimeType == PGMImage ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null, //TODO NULL IF NO PGM
-                      ),
-
-                    ],
-                  ),
+                  ],
                 ),
 
 

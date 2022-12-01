@@ -48,28 +48,55 @@ Widget menuDropDownButton({
       ),
       items: onChanged != null ? options.map((e) {
         return DropdownMenuItem(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(e),
-              if(i != options.length-1) Divider()
-          ],
-        ), value: i++,);
+          child: AutoSizeText(
+            e,
+            minFontSize: 12,
+            maxFontSize: 14,
+          ),
+          value: i++,);
       }).toList() : null,
       onChanged: (int? val){
         if(onChanged != null && val != null) onChanged[val]();
       },
-      dropdownWidth: deviceWidth * 0.15,
+      dropdownWidth: deviceWidth > 1000 ? deviceWidth * 0.18 : deviceWidth * 0.5,
       dropdownDecoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
         color: Colors.white,
       ),
       dropdownElevation: 8,
-      itemHeight: deviceWidth*0.03,
       buttonDecoration: BoxDecoration(
         color: Colors.red,
       )
+    ),
+  );
+}
+
+Widget menuBar({
+  required double deviceWidth,
+  required double deviceHeight,
+  required List<List<VoidCallback>> onChanged,
+  required List<List<String>> options,
+}){
+  return Container(
+    width: deviceWidth,
+    height: deviceHeight*0.08,
+    color: Colors.blue,
+    child: Row(
+      children: [
+
+        SizedBox(width: deviceWidth*0.02,),
+
+        menuDropDownButton(
+          title: "Fichier",
+          deviceWidth: deviceWidth,
+          onChanged: onChanged[0],
+          options: options[0],
+        ),
+
+        SizedBox(width: deviceWidth*0.02,),
+
+
+      ],
     ),
   );
 }
