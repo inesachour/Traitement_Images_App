@@ -149,8 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
 
                           if(toolPanelSelected == 1)
-                          ModifyContract(onModifyContrast: onModifyContrastClick),
-
+                            ModifyContract(onModifyContrast: onModifyContrastClick),
+                          if(toolPanelSelected == 2)
+                            ImageFilters()
 
                         ],
                       ),

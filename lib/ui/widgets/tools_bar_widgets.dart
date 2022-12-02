@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 
@@ -196,4 +197,35 @@ Widget toolBar({
       ),
     ],
   );
+}
+
+
+class ImageFilters extends StatefulWidget {
+  const ImageFilters({Key? key}) : super(key: key);
+
+  @override
+  State<ImageFilters> createState() => _ImageFiltersState();
+}
+
+class _ImageFiltersState extends State<ImageFilters> {
+  @override
+  Widget build(BuildContext context) {
+    return ExpandablePanel(
+      header: Text("Filtre Moyenneur"),
+      collapsed: Text(""),
+      expanded: TextFormField(
+        keyboardType: TextInputType.number,
+        validator: (value){
+          if(value != null){
+            int? v = int.tryParse(value);
+            if(v != null){
+              if(v%2 ==1) return null;
+            }
+          }
+          return "maha2ah";
+
+        },
+      ),
+    );
+  }
 }
