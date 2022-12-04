@@ -32,7 +32,6 @@ class ImagesService{
     maxValue = int.parse(contents[3].split(" ")[0]);
     PGMImage img = PGMImage(lx: lx, ly: ly, maxValue: maxValue);
     for(int i =4 ; i< contents.length; i++){
-      //contents[i].split(" ").forEach((element) {print(element);});
       contents[i] = contents[i].trim();
       List<int> pixels = contents[i].split(" ").map((e) => int.parse(e)).toList();
       img.mat.add(pixels);
@@ -48,14 +47,21 @@ class ImagesService{
     ly = int.parse(contents[2].split(" ")[0]);
     maxValue = int.parse(contents[3].split(" ")[0]);
     PPMImage img = PPMImage(lx: lx, ly: ly, maxValue: maxValue);
-    for(int i =4 ; i< contents.length; i++){
-      List<int> pixels = contents[i].split(" ").map((e) => int.parse(e)).toList();
-      for(int j =0; j<pixels.length; j+=3){
-        img.r.add(pixels[j]);
-        img.g.add(pixels[j+1]);
-        img.b.add(pixels[j+2]);
-      }
+    List<int> pixels = [];
+    for(int i =4 ; i< contents.length; i++) {
+      contents[i].split(" ").forEach((element) {
+        if (int.tryParse(element) != null) {
+          pixels.add(int.parse(element));
+        }
+      });
     }
+    for(int j=0; j<pixels.length; j+=3){
+
+      img.r.add(pixels[j]);
+      img.g.add(pixels[j+1]);
+      img.b.add(pixels[j+2]);
+    }
+
     return img;
   }
 
@@ -63,32 +69,37 @@ class ImagesService{
     final File file = File("$path.pgm");
     String text = "P2\n# commentaire\n${img.ly} ${img.lx}\n${img.maxValue}";
     for(int row =0 ; row < img.lx; row++){
-      text += "\n";
+      String text2 = "\n";
       for (int col = 0; col < img.ly; col++) {
-        text+= img.mat[row][col].toString();
+        text2+= img.mat[row][col].toString();
         if(col != img.ly-1) {
-          text += " ";
+          text2 += " ";
         }
       }
+      text+=text2;
+      text2= '';
     }
     await file.writeAsString(text);
-
   }
 
-  void writePPM(PPMImage img, String path) async {
+  Future<void> writePPM(PPMImage img, String path) async {
+
     final File file = File("$path.ppm");
     String text = "P3\n# commentaire\n${img.ly} ${img.lx}\n${img.maxValue}";
     for(int row =0 ; row < img.lx; row++){
-      text += "\n";
+      String text2 = "\n";
       for (int col = 0; col < img.ly; col++) {
-        text+= "${img.r[row*img.lx + col]} ";
-        text+= "${img.g[row*img.lx + col]} ";
-        text+= img.b[row*img.lx + col].toString();
+        text2+= "${img.r[row*(img.lx-1) + col]} ";
+        text2+= "${img.g[row*(img.lx-1) + col]} ";
+        text2+= img.b[row*(img.lx-1) + col].toString();
         if(col != img.ly-1) {
-          text += " ";
+          text2 += " ";
         }
       }
+      text+=text2;
+      text2= '';
     }
+
     await file.writeAsString(text);
   }
 
@@ -100,6 +111,32 @@ class ImagesService{
       }
     }
     return moy/(img.lx*img.ly);
+  }
+
+  List<double> moyennePPM(PPMImage img){
+    List<double> moys = List.filled(3, 0);
+    for (int row = 0; row < img.lx; row++) {
+      for (int col = 0; col < img.ly; col++) {
+        moys[0] += img.r[row*img.lx + col];
+        moys[1] += img.g[row*img.lx + col];
+        moys[2] += img.b[row*img.lx + col];
+      }
+    }
+    moys[0] = moys[0]/(img.lx*img.ly);
+    moys[1] = moys[1]/(img.lx*img.ly);
+    moys[2] = moys[2]/(img.lx*img.ly);
+    return moys;
+  }
+
+  double moyennePPMFromHist(List<int> hist,int start, int end){
+    double moy = 0;
+    for(int i=start; i<= end;i++ ){
+      moy += hist[i];
+    }
+
+    moy = moy/ (end-start+1);
+
+    return moy;
   }
 
   double ecartTypePGM(PGMImage img){
@@ -122,6 +159,28 @@ class ImagesService{
       }
     }
     return hist;
+  }
+
+  List<int> histogramme(List<int> pixels, int maxValue){
+    List<int> hist = List.filled(maxValue+1,0);
+    for (int row = 0; row < pixels.length; row++) {
+      hist[pixels[row]] ++;
+    }
+    return hist;
+  }
+
+  List<List<int>> histogrammePPM(PPMImage img){
+    List<int> histR = List.filled(img.maxValue+1,0);
+    List<int> histG = List.filled(img.maxValue+1,0);
+    List<int> histB = List.filled(img.maxValue+1,0);
+    for (int row = 0; row < img.lx; row++) {
+      for (int col = 0; col < img.ly; col++) {
+        histR[img.r[row*img.lx + col]] ++;
+        histG[img.g[row*img.lx + col]] ++;
+        histB[img.b[row*img.lx + col]] ++;
+      }
+    }
+    return [histR, histG, histB];
   }
 
   List<int> histogrammeCumulePGM(PGMImage img){
@@ -332,27 +391,152 @@ class ImagesService{
     return sqrt(x/y);
   }
 
-  PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path){
+  PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path) {
     PPMImage img2 = PPMImage.clone(img);
     img2.r = img.r.map((e)=>e).toList();
     img2.g = img.g.map((e)=>e).toList();
     img2.b = img.b.map((e)=>e).toList();
 
-    for(int row =0; row <img.lx; row++){
+    for(int row =0; row < img.lx; row++){
       for (int col = 0; col < img.ly; col++) {
-        int x = row*img.lx + col;
-        if(  option == 0
-            || (option == 1 && !(img.r[x] > seuils[0] && img.g[x] > seuils[1] && img.b[x] > seuils[2]))
-            || (option == 2 && !(img.r[x] > seuils[0] || img.g[x] > seuils[1] || img.b[x] > seuils[2]))
-        ){
+        int x = row*(img.lx-1) + col;
+        if(option ==0){
           img2.r[x] = (img.r[x] > seuils[0]) ? img2.maxValue : 0;
           img2.g[x] = (img.g[x] > seuils[1]) ? img2.maxValue : 0;
           img2.b[x] = (img.b[x] > seuils[2]) ? img2.maxValue : 0;
         }
+        else if(option == 1){
+          if((img.r[x] > seuils[0] && img.g[x] > seuils[1] && img.b[x] > seuils[2])){
+            img2.r[x] = img2.maxValue;
+            img2.g[x] = img2.maxValue;
+            img2.b[x] = img2.maxValue;
+          }
+          else{
+            img2.r[x] = 0;
+            img2.g[x] = 0;
+            img2.b[x] = 0;
+          }
+        }
+        else{
+          if((img.r[x] > seuils[0] || img.g[x] > seuils[1] || img.b[x] > seuils[2])){
+            img2.r[x] = img2.maxValue;
+            img2.g[x] = img2.maxValue;
+            img2.b[x] = img2.maxValue;
+          }
+          else{
+            img2.r[x] = 0;
+            img2.g[x] = 0;
+            img2.b[x] = 0;
+          }
+        }
       }
     }
+    writePPM(img2, path);
+    return img2;
+  }
+
+  PPMImage seuillageOtsu(PPMImage img, int option,String path) {
+    List<int> seuils= [0,0,0];
+
+    seuils[0] = seuillageOtsuCouleur(img.r, img.maxValue);
+    seuils[1] = seuillageOtsuCouleur(img.g, img.maxValue);
+    seuils[2] = seuillageOtsuCouleur(img.b, img.maxValue);
+
+    print("${seuils[0]} ${seuils[1]} ${seuils[2]}");
+    return seuillageManuel(img, seuils, option, path);
+
+  }
+
+  int seuillageOtsuCouleur(List<int> pixels, int maxValue){
+
+    ///Calcul d'histogramme
+    List<int> hist = histogramme(pixels, maxValue);
+
+    ///Calcul de proba cumulé
+    List<double> probasCumule= List.filled(maxValue+1, 0);
+    probasCumule[0] = hist[0]/pixels.length;
+    for(int i=1; i <= maxValue ;i++){
+      probasCumule[i] = probasCumule[i-1] + hist[i]/ pixels.length;
+    }
+
+    ///calcul variance interclasse
+    double moy = moyennePPMFromHist(hist, 0, maxValue);
+    int kMax = 1;
+    double varianceMax = 0;
+    double moyC1 = 0;
+    double variance = 0;
+    for(int i=1; i< maxValue; i++){
+      moyC1 = moyennePPMFromHist(hist, 0, i);
+      variance = ((moy*probasCumule[i]- moyC1)*(moy*probasCumule[i]- moyC1))/(probasCumule[i]*(1-probasCumule[i]));
+      if(variance > varianceMax){
+        varianceMax = variance;
+        kMax = i;
+      }
+    }
+
+    return kMax;
+  }
+
+
+  PPMImage erosion(PPMImage img, int n, String path, bool create){
+    PPMImage img2 = PPMImage.clone(img);
+    int x = (n/2).floor();
+    img2.r = erosionDilationColor(img.r, x, img.lx, img.ly,0);
+    img2.g = erosionDilationColor(img.g, x, img.lx, img.ly,0);
+    img2.b = erosionDilationColor(img.b, x, img.lx, img.ly,0);
+
+    if(create) writePPM(img2, path);
+    return img2;
+  }
+
+  PPMImage dilatation(PPMImage img, int n, String path, bool create){
+    PPMImage img2 = PPMImage.clone(img);
+    int x = (n/2).floor();
+    img2.r = erosionDilationColor(img.r, x, img.lx, img.ly,img.maxValue);
+    img2.g = erosionDilationColor(img.g, x, img.lx, img.ly,img.maxValue);
+    img2.b = erosionDilationColor(img.b, x, img.lx, img.ly,img.maxValue);
+
+    if(create) writePPM(img2, path);
+    return img2;
+  }
+
+  /// val =0 : erosion | val = maxValue : dilatation
+  List<int> erosionDilationColor(List<int> pixels, int x, int lx , int ly, int val){
+    List<int> erosion = pixels.map((e) => e).toList();
+
+    for(int row =0; row < lx; row++){
+      for (int col = 0; col < ly; col++) {
+        bool b = true;
+        for(int i = row-x; i<= row+x;i++) {
+          for (int j = col-x; j <= col+x; j++) {
+            if((i>=0 && j>=0) && (i<lx && j<ly)){
+              if(pixels[i*(lx-1)+j] == val){
+                erosion[row*(lx-1)+col] = val;
+                b = false;
+                break;
+              }
+            }
+          }
+          if(!b) break;
+        }
+      }
+    }
+    return erosion;
+  }
+
+  PPMImage ouverture(PPMImage img, int n, String path){
+    PPMImage img2 = PPMImage.clone(img);
+    img2 = dilatation(erosion(img, n, path, false), n, path, false);
 
     writePPM(img2, path);
     return img2;
   }
+
+  PPMImage fermeture(PPMImage img, int n, String path){
+    PPMImage img2 = PPMImage.clone(img);
+    img2 = erosion(dilatation(img, n, path, false), n, path, false);
+    writePPM(img2, path);
+    return img2;
+  }
+
 }

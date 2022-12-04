@@ -57,7 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
         //imagesService.filtreHighBoost(image, j, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\f_highboost");
 
-        //imagesService.seuillageManuel(image, [10,10,10], 2, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuil");
+        //imagesService.seuillageManuel(image, [10,10,10],1, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuilManuel");
+        var img = imagesService.seuillageOtsu(image, 1, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuilOtsu");
+
+        imagesService.ouverture(img, 3, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\ouverture");
+        imagesService.fermeture(img, 3, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\fermeture");
+
 
 
       }
@@ -115,13 +120,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
 
             //Footer Bar
-            footerBar(
+            /*footerBar(
               deviceHeight: deviceHeight,
               deviceWidth: deviceWidth,
               moyenne: image != null ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
               ecartType: image != null ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
               show: image != null && image.runtimeType == PGMImage ,
-            ),
+            ),*/ //TODO calcul de moyenne pour ppm
 
             Column(
               children: [
