@@ -57,13 +57,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
         //imagesService.filtreHighBoost(image, j, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\f_highboost");
 
-        //imagesService.seuillageManuel(image, [10,10,10],1, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuilManuel");
-        var img = imagesService.seuillageOtsu(image, 1, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\seuilOtsu");
-
-        imagesService.ouverture(img, 3, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\ouverture");
-        imagesService.fermeture(img, 3, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\fermeture");
+        /// ----  Exercice 1 ----
+        imagesService.seuillageManuel(image, [10,10,10],1, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\seuilManuel");
 
 
+        /// ----  Exercice 2 ----
+        var img = imagesService.seuillageOtsu(image, 1, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\seuilOtsu");
+
+        /// ----  Exercice 3 ----
+
+        ///1) Erosion
+        imagesService.erosion(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\erosion", true);
+        ///2) Dilatation
+        imagesService.dilatation(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\dilatation", true);
+        ///3) Ouverture
+        imagesService.ouverture(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\ouverture");
+        ///3) Fermeture
+        imagesService.fermeture(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\fermeture");
+
+
+        imagesService.writePPM(image, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\peppers1");
 
       }
     };

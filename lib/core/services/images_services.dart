@@ -43,15 +43,15 @@ class ImagesService{
     File file = File(path);
     int maxValue, lx, ly;
     final contents = await file.readAsLines();
-    lx = int.parse(contents[2].split(" ")[1]);
     ly = int.parse(contents[2].split(" ")[0]);
+    lx = int.parse(contents[2].split(" ")[1]);
     maxValue = int.parse(contents[3].split(" ")[0]);
     PPMImage img = PPMImage(lx: lx, ly: ly, maxValue: maxValue);
     List<int> pixels = [];
     for(int i =4 ; i< contents.length; i++) {
       contents[i].split(" ").forEach((element) {
-        if (int.tryParse(element) != null) {
-          pixels.add(int.parse(element));
+        if (int.tryParse(element.trim()) != null) {
+          pixels.add(int.parse(element.trim()));
         }
       });
     }
@@ -61,6 +61,9 @@ class ImagesService{
       img.g.add(pixels[j+1]);
       img.b.add(pixels[j+2]);
     }
+
+    print(contents.length);
+
 
     return img;
   }
@@ -89,9 +92,9 @@ class ImagesService{
     for(int row =0 ; row < img.lx; row++){
       String text2 = "\n";
       for (int col = 0; col < img.ly; col++) {
-        text2+= "${img.r[row*(img.lx-1) + col]} ";
-        text2+= "${img.g[row*(img.lx-1) + col]} ";
-        text2+= img.b[row*(img.lx-1) + col].toString();
+        text2+= "${img.r[row*(img.ly) + col]} ";
+        text2+= "${img.g[row*(img.ly) + col]} ";
+        text2+= img.b[row*(img.ly) + col].toString();
         if(col != img.ly-1) {
           text2 += " ";
         }
@@ -117,9 +120,9 @@ class ImagesService{
     List<double> moys = List.filled(3, 0);
     for (int row = 0; row < img.lx; row++) {
       for (int col = 0; col < img.ly; col++) {
-        moys[0] += img.r[row*img.lx + col];
-        moys[1] += img.g[row*img.lx + col];
-        moys[2] += img.b[row*img.lx + col];
+        moys[0] += img.r[row*img.ly + col];
+        moys[1] += img.g[row*img.ly + col];
+        moys[2] += img.b[row*img.ly + col];
       }
     }
     moys[0] = moys[0]/(img.lx*img.ly);
@@ -175,9 +178,9 @@ class ImagesService{
     List<int> histB = List.filled(img.maxValue+1,0);
     for (int row = 0; row < img.lx; row++) {
       for (int col = 0; col < img.ly; col++) {
-        histR[img.r[row*img.lx + col]] ++;
-        histG[img.g[row*img.lx + col]] ++;
-        histB[img.b[row*img.lx + col]] ++;
+        histR[img.r[row*img.ly + col]] ++;
+        histG[img.g[row*img.ly + col]] ++;
+        histB[img.b[row*img.ly + col]] ++;
       }
     }
     return [histR, histG, histB];
@@ -399,7 +402,7 @@ class ImagesService{
 
     for(int row =0; row < img.lx; row++){
       for (int col = 0; col < img.ly; col++) {
-        int x = row*(img.lx-1) + col;
+        int x = row * img.ly + col;
         if(option ==0){
           img2.r[x] = (img.r[x] > seuils[0]) ? img2.maxValue : 0;
           img2.g[x] = (img.g[x] > seuils[1]) ? img2.maxValue : 0;
@@ -410,7 +413,7 @@ class ImagesService{
             img2.r[x] = img2.maxValue;
             img2.g[x] = img2.maxValue;
             img2.b[x] = img2.maxValue;
-          }
+           }
           else{
             img2.r[x] = 0;
             img2.g[x] = 0;
@@ -510,8 +513,8 @@ class ImagesService{
         for(int i = row-x; i<= row+x;i++) {
           for (int j = col-x; j <= col+x; j++) {
             if((i>=0 && j>=0) && (i<lx && j<ly)){
-              if(pixels[i*(lx-1)+j] == val){
-                erosion[row*(lx-1)+col] = val;
+              if(pixels[i*ly+j] == val){
+                erosion[row*ly+col] = val;
                 b = false;
                 break;
               }
