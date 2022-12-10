@@ -6,6 +6,7 @@ import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
+import 'package:traitement_image/ui/popups/filtre_hightboost_popup.dart';
 import 'package:traitement_image/ui/popups/morphology_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_convolution_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
@@ -101,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if(outputFile != null){
           if(image.runtimeType == PGMImage){
-            imagesService.filtreMoyenneur(image, n, outputFile);
+            imagesService.filtreMoyenneur(image, n, outputFile, true);
           }
         }
       }
@@ -131,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (outputFile != null) {
           if (image.runtimeType == PGMImage) {
-            imagesService.filtreMedian(image, l[0], l[1],outputFile);
+            imagesService.filtreMedian(image, l[0], l[1],outputFile, true);
           }
         }
       }
@@ -162,6 +163,46 @@ class _HomeScreenState extends State<HomeScreen> {
         if(outputFile != null){
           if(image.runtimeType == PGMImage){
             imagesService.filtreConvolution(image, l, outputFile);
+          }
+        }
+      }
+    };
+
+    VoidCallback onFiltreHighBoostClick = () async{
+      List<int>? l = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: FiltreHightBoostPopup(),
+              height: deviceHeight*0.3,
+              width: deviceWidth*0.25,
+            ),
+
+          );
+        },
+      );
+      if(l!=null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "high-boost",
+        );
+
+        if(outputFile != null){
+          if(image.runtimeType == PGMImage){
+            late PGMImage imageFiltreBas;
+            if(l[0] == 0){ //Moyenneur
+              imageFiltreBas = imagesService.filtreMoyenneur(image, l[1], outputFile,true);
+            }
+            else if(l[0] == 1){ //Median
+              imageFiltreBas = imagesService.filtreMedian(image, l[1], false,outputFile,true);
+            }
+            else{ //Median carre
+              imageFiltreBas = imagesService.filtreMedian(image, l[1], true,outputFile,true);
+            }
+            imagesService.filtreHighBoost(image, imageFiltreBas, outputFile);
           }
         }
       }
@@ -335,8 +376,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       deviceWidth: deviceWidth,
                       deviceHeight: deviceHeight,
                       imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
-                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onFiltreHighBoostClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
+                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Filtre High-Boost", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
                     ),
 
                     //Graphs

@@ -261,7 +261,7 @@ class ImagesService{
     return img2;
   }
 
-  PGMImage filtreMoyenneur(PGMImage img, int n, String path){
+  PGMImage filtreMoyenneur(PGMImage img, int n, String path, bool create){
 
     PGMImage img2 = PGMImage.clone(img);
     img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
@@ -282,11 +282,12 @@ class ImagesService{
       }
     }
 
-    writePGM(img2, path);
+    if(create)
+      writePGM(img2, path);
     return img2;
   }
 
-  PGMImage filtreMedian(PGMImage img, int n, bool square,String path){
+  PGMImage filtreMedian(PGMImage img, int n, bool square,String path, bool create){
 
     PGMImage img2 = PGMImage.clone(img);
     img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
@@ -333,7 +334,8 @@ class ImagesService{
       }
     }
 
-    writePGM(img2, path);
+    if(create)
+      writePGM(img2, path);
     return img2;
   }
 
@@ -362,7 +364,6 @@ class ImagesService{
     return img2;
   }
 
-  //TODO
   PGMImage filtreHighBoost(PGMImage img, PGMImage imgFiltre ,String path){ //TODO USER CHOOSE WHICH FILTER TO YA3MEL
     PGMImage img2 = PGMImage.clone(img);
     img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
@@ -390,7 +391,6 @@ class ImagesService{
     return sqrt(x/y);
   }
 
-  //TODO
   PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path, bool create) {
     PPMImage img2 = PPMImage.clone(img);
     img2.r = img.r.map((e)=>e).toList();

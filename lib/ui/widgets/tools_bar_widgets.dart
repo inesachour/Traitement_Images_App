@@ -60,6 +60,13 @@ Widget toolBar({
           activated: imageIsPGM != null && imageIsPGM,
         ),
         SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[3],
+          title: titles[3],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && imageIsPGM,
+        ),
+        SizedBox(height: deviceHeight*0.01,),
         Divider(),
 
         ///Contrast
@@ -69,8 +76,8 @@ Widget toolBar({
         ),
         SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
-          onPressed: onPressedList[3],
-          title: titles[3],
+          onPressed: onPressedList[4],
+          title: titles[4],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && imageIsPGM,
         ),
@@ -81,13 +88,6 @@ Widget toolBar({
         Container(
           width: deviceWidth,
           child: Text("Seuillage", textAlign: TextAlign.center,),
-        ),
-        SizedBox(height: deviceHeight*0.01,),
-        toolBarButton(
-          onPressed: onPressedList[4],
-          title: titles[4],
-          deviceWidth: deviceWidth,
-          activated: imageIsPGM != null && !imageIsPGM,
         ),
         SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
@@ -121,6 +121,13 @@ Widget toolBar({
         toolBarButton(
           onPressed: onPressedList[9],
           title: titles[9],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && !imageIsPGM,
+        ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[10],
+          title: titles[10],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && !imageIsPGM,
         ),
