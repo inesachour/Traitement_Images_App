@@ -117,6 +117,13 @@ Widget toolBar({
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && !imageIsPGM,
         ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[9],
+          title: titles[9],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && !imageIsPGM,
+        ),
       ],
     ),
   );

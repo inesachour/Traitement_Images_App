@@ -11,6 +11,7 @@ import 'package:traitement_image/ui/popups/filtre_convolution_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
 import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
+import 'package:traitement_image/ui/popups/seuillage_manuel_popup.dart';
 import 'package:traitement_image/ui/popups/seuillage_otsu_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
@@ -229,6 +230,38 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     };
 
+    VoidCallback onSeuillageManuelClick = () async {
+      List? res = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: SeuillageManuelPopup(),
+              height: deviceHeight*0.32,
+              width: deviceWidth*0.25,
+            ),
+
+          );
+        },
+      );
+      if(res!=null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "manuel",
+        );
+
+        if(outputFile != null){
+          if(image.runtimeType == PPMImage){
+            setState((){
+              imgSeuille = imagesService.seuillageManuel(image, res[0], res[1], outputFile, true);
+            });
+
+          }
+        }
+      }
+    };
 
     VoidCallback onMorphologyClick(String choice){
       return () async {
@@ -302,8 +335,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       deviceWidth: deviceWidth,
                       deviceHeight: deviceHeight,
                       imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
-                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
+                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
                     ),
 
                     //Graphs
