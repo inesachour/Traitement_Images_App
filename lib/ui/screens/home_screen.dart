@@ -10,6 +10,7 @@ import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
+import 'package:traitement_image/ui/popups/morphology_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_convolution_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
@@ -29,7 +30,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   var image;
-  PGMImage? contrastedImage = null;
+  PPMImage? imgSeuille;
   ImagesService imagesService = ImagesService();
   AlertsService alertsService = AlertsService();
   int toolPanelSelected = 0;
@@ -223,11 +224,62 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if(outputFile != null){
           if(image.runtimeType == PPMImage){
-            imagesService.seuillageOtsu(image, option, outputFile);
+            setState((){
+              imgSeuille = imagesService.seuillageOtsu(image, option, outputFile, true);
+            });
+
           }
         }
       }
     };
+
+
+    VoidCallback onMorphologyClick(String choice){
+      return () async {
+        int? n = await showDialog(
+          context: context,
+          barrierDismissible: false, // user must tap button!
+          builder: (BuildContext context) {
+            return AlertDialog(
+              contentPadding: EdgeInsets.all(0),
+              content: Container(
+                child: MorphologyPopup(),
+                height: deviceHeight*0.2,
+                width: deviceWidth*0.25,
+              ),
+
+            );
+          },
+        );
+        if(n!=null){
+          String? outputFile = await FilePicker.platform.saveFile(
+            dialogTitle: 'Enregister l\'image dans',
+            fileName: choice.toLowerCase(),
+          );
+
+          if(outputFile != null){
+            if(imgSeuille == null)
+              imgSeuille = imagesService.seuillageOtsu(image, 0, "",false);
+            if(image.runtimeType == PPMImage){
+              if(choice.toLowerCase() == "erosion"){
+                imagesService.erosion(imgSeuille!, n, outputFile, true);
+              }
+              else if(choice.toLowerCase() == "dilatation"){
+                imagesService.dilatation(imgSeuille!, n, outputFile,true);
+              }
+              else if(choice.toLowerCase() == "fermeture"){
+                imagesService.fermeture(imgSeuille!, n, outputFile);
+              }
+              else if(choice.toLowerCase() == "ouverture"){
+                imagesService.ouverture(imgSeuille!, n, outputFile);
+              }
+
+            }
+          }
+        }
+      };
+    }
+
 
 
     return SafeArea(
@@ -254,8 +306,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       deviceWidth: deviceWidth,
                       deviceHeight: deviceHeight,
                       imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick],
-                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu"]
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
+                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
                     ),
 
                     //Graphs

@@ -32,8 +32,8 @@ class _FiltreMoyenneurPopupState extends State<FiltreMoyenneurPopup> {
                     controller: nController,
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0) {
-                        return 'Entrer un n impair';
+                      if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 || int.parse(value) < 3) {
+                        return 'Entrer un n impair supérieur à 1';
                       }
                       return null;
                     },

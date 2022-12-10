@@ -391,7 +391,7 @@ class ImagesService{
   }
 
   //TODO
-  PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path) {
+  PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path, bool create) {
     PPMImage img2 = PPMImage.clone(img);
     img2.r = img.r.map((e)=>e).toList();
     img2.g = img.g.map((e)=>e).toList();
@@ -431,19 +431,20 @@ class ImagesService{
         }
       }
     }
-    writePPM(img2, path);
+    if(create)
+      writePPM(img2, path);
     return img2;
   }
 
   //TODO ou option ???
-  PPMImage seuillageOtsu(PPMImage img, int option,String path) {
+  PPMImage seuillageOtsu(PPMImage img, int option,String path, bool create) {
     List<int> seuils= [0,0,0];
 
     seuils[0] = seuillageOtsuCouleur(img.r, img.maxValue);
     seuils[1] = seuillageOtsuCouleur(img.g, img.maxValue);
     seuils[2] = seuillageOtsuCouleur(img.b, img.maxValue);
 
-    return seuillageManuel(img, seuils, option, path);
+    return seuillageManuel(img, seuils, option, path, create);
 
   }
 
@@ -477,7 +478,6 @@ class ImagesService{
     return kMax;
   }
 
-  //TODO
   PPMImage erosion(PPMImage img, int n, String path, bool create){
     PPMImage img2 = PPMImage.clone(img);
     int x = (n/2).floor();
@@ -489,7 +489,6 @@ class ImagesService{
     return img2;
   }
 
-  //TODO
   PPMImage dilatation(PPMImage img, int n, String path, bool create){
     PPMImage img2 = PPMImage.clone(img);
     int x = (n/2).floor();
@@ -501,7 +500,6 @@ class ImagesService{
     return img2;
   }
 
-  //TODO
   /// val =0 : erosion | val = maxValue : dilatation
   List<int> erosionDilationColor(List<int> pixels, int x, int lx , int ly, int val){
     List<int> erosion = pixels.map((e) => e).toList();
@@ -526,7 +524,6 @@ class ImagesService{
     return erosion;
   }
 
-  //TODO
   PPMImage ouverture(PPMImage img, int n, String path){
     PPMImage img2 = PPMImage.clone(img);
     img2 = dilatation(erosion(img, n, path, false), n, path, false);
@@ -535,7 +532,6 @@ class ImagesService{
     return img2;
   }
 
-  //TODO
   PPMImage fermeture(PPMImage img, int n, String path){
     PPMImage img2 = PPMImage.clone(img);
     img2 = erosion(dilatation(img, n, path, false), n, path, false);

@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
-class FiltreMedianPopup extends StatefulWidget {
-  const FiltreMedianPopup({Key? key}) : super(key: key);
+class MorphologyPopup extends StatefulWidget {
+  const MorphologyPopup({Key? key}) : super(key: key);
 
   @override
-  State<FiltreMedianPopup> createState() => _FiltreMedianPopupState();
+  State<MorphologyPopup> createState() => _MorphologyPopupState();
 }
 
-class _FiltreMedianPopupState extends State<FiltreMedianPopup> {
+class _MorphologyPopupState extends State<MorphologyPopup> {
 
-  TextEditingController nController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool checkedValue = false;
+  TextEditingController nController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +18,9 @@ class _FiltreMedianPopupState extends State<FiltreMedianPopup> {
     double deviceWidth = MediaQuery.of(context).size.width;
     double deviceHeight = MediaQuery.of(context).size.height;
 
-
     return Scaffold(
       body: Stack(
         children: [
-
           Container(
             padding: EdgeInsets.symmetric(horizontal: deviceWidth*0.04, vertical: deviceHeight*0.01),
             child: Form(
@@ -34,8 +31,8 @@ class _FiltreMedianPopupState extends State<FiltreMedianPopup> {
                     controller: nController,
                     keyboardType: TextInputType.number,
                     validator: (value) {
-                      if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 || int.parse(value) < 3) {
-                        return 'Entrer un n impair superieur à 1';
+                      if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 ||  int.parse(value) < 3) {
+                        return 'Entrer un n impair supérieur à 1';
                       }
                       return null;
                     },
@@ -48,35 +45,19 @@ class _FiltreMedianPopupState extends State<FiltreMedianPopup> {
                     height: deviceHeight*0.02,
                   ),
 
-                  CheckboxListTile(
-                    title: Text("Masque carré"), //    <-- label
-                    value: checkedValue,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    onChanged: (newValue) {
-                      setState((){
-                        checkedValue = newValue!;
-                      });
-                    },
-                  ),
-
-                  SizedBox(
-                    height: deviceHeight*0.02,
-                  ),
-
                   ElevatedButton(
                     onPressed: (){
                       if (_formKey.currentState!.validate()){
                         var x = int.parse(nController.text);
-                        Navigator.pop(context,[x,checkedValue]);
+                        Navigator.pop(context,x);
                       }
                     },
-                    child: Text("Générer"),
+                    child: Text("Confirmer"),
                   ),
                 ],
               ),
             ),
           ),
-
           Positioned(
             right: 0,
             top: 0,
