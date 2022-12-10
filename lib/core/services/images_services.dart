@@ -61,10 +61,6 @@ class ImagesService{
       img.g.add(pixels[j+1]);
       img.b.add(pixels[j+2]);
     }
-
-    print(contents.length);
-
-
     return img;
   }
 
@@ -205,11 +201,9 @@ class ImagesService{
     for(int i=0;i<n.length;i++){
       histEgalise[n[i]] += hist[i];
     }
-
     return histEgalise;
   }
 
-  //TODO
   PGMImage modifyContrastPGM(PGMImage img, Map<int,int> points, String path){
     if(!points.keys.contains(0)) points.addAll({0:0});
     if(!points.keys.contains(img.maxValue)) points.addAll({img.maxValue : img.maxValue});
@@ -441,7 +435,7 @@ class ImagesService{
     return img2;
   }
 
-  //TODO
+  //TODO ou option ???
   PPMImage seuillageOtsu(PPMImage img, int option,String path) {
     List<int> seuils= [0,0,0];
 
@@ -449,12 +443,10 @@ class ImagesService{
     seuils[1] = seuillageOtsuCouleur(img.g, img.maxValue);
     seuils[2] = seuillageOtsuCouleur(img.b, img.maxValue);
 
-    print("${seuils[0]} ${seuils[1]} ${seuils[2]}");
     return seuillageManuel(img, seuils, option, path);
 
   }
 
-  //TODO
   int seuillageOtsuCouleur(List<int> pixels, int maxValue){
 
     ///Calcul d'histogramme

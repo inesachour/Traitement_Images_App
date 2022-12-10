@@ -33,6 +33,8 @@ Widget toolBar({
     color: Colors.grey.shade200,
     child: Column(
       children: [
+
+        ///Filtres
         Divider(),
         Container(
           width: deviceWidth,
@@ -62,6 +64,7 @@ Widget toolBar({
         SizedBox(height: deviceHeight*0.01,),
         Divider(),
 
+        ///Contrast
         Container(
           width: deviceWidth,
           child: Text("Contrast", textAlign: TextAlign.center,),
@@ -72,6 +75,21 @@ Widget toolBar({
           title: titles[3],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && imageIsPGM,
+        ),
+        SizedBox(height: deviceHeight*0.01,),
+        Divider(),
+
+        ///Seuillage
+        Container(
+          width: deviceWidth,
+          child: Text("Seuillage", textAlign: TextAlign.center,),
+        ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[4],
+          title: titles[4],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && !imageIsPGM,
         ),
       ],
     ),

@@ -14,6 +14,7 @@ import 'package:traitement_image/ui/popups/filtre_convolution_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
 import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
+import 'package:traitement_image/ui/popups/seuillage_otsu_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
@@ -198,6 +199,36 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     };
 
+    VoidCallback onSeuillageOtsuClick = () async {
+      int? option = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: SeuillageOtsuPopup(),
+              height: deviceHeight*0.25,
+              width: deviceWidth*0.25,
+            ),
+
+          );
+        },
+      );
+      if(option!=null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "otsu",
+        );
+
+        if(outputFile != null){
+          if(image.runtimeType == PPMImage){
+            imagesService.seuillageOtsu(image, option, outputFile);
+          }
+        }
+      }
+    };
+
 
     return SafeArea(
       child: Scaffold(
@@ -223,8 +254,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       deviceWidth: deviceWidth,
                       deviceHeight: deviceHeight,
                       imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick],
-                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast"]
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick],
+                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu"]
                     ),
 
                     //Graphs
