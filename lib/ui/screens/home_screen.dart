@@ -10,6 +10,8 @@ import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
+import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
+import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
@@ -48,36 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         setState((){});
 
-        //PGMImage bruit = ImagesService().bruit(image, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\bruit");
-        //var i = imagesService.filtreMedian(bruit,3,false,"D:\\Users\\Ines\\Desktop\\Traitement D'images\\f_med");
-        //var j = imagesService.filtreMoyenneur(bruit,3,"D:\\Users\\Ines\\Desktop\\Traitement D'images\\f_moy");
-        //print(imagesService.signalBruit(image, i));
-        //print(imagesService.signalBruit(image, j));
-        //imagesService.filtreConvolution(image,[[-1,-1,-1],[-1,9,-1],[-1,-1,-1]],"D:\\Users\\Ines\\Desktop\\Traitement D'images\\f-passe_haut");
-
-        //imagesService.filtreHighBoost(image, j, "D:\\Users\\Ines\\Desktop\\Traitement D'images\\f_highboost");
-
-        /// ----  Exercice 1 ----
-        imagesService.seuillageManuel(image, [10,10,10],1, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\seuilManuel");
-
-
-        /// ----  Exercice 2 ----
-        var img = imagesService.seuillageOtsu(image, 1, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\seuilOtsu");
-
-        /// ----  Exercice 3 ----
-
-        ///1) Erosion
-        imagesService.erosion(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\erosion", true);
-        ///2) Dilatation
-        imagesService.dilatation(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\dilatation", true);
-        ///3) Ouverture
-        imagesService.ouverture(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\ouverture");
-        ///3) Fermeture
-        imagesService.fermeture(img, 3, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\fermeture");
-
-
-        imagesService.writePPM(image, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\peppers1");
-
       }
     };
 
@@ -104,6 +76,69 @@ class _HomeScreenState extends State<HomeScreen> {
 
     };
 
+    VoidCallback onFiltreMoyenneurClick = () async{
+      int? n = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: FiltreMoyenneurPopup(),
+              height: deviceHeight*0.18,
+              width: deviceWidth*0.2,
+            ),
+
+          );
+        },
+      );
+      if(n!=null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "moyenneur",
+        );
+
+        if(outputFile != null){
+          if(image.runtimeType == PGMImage){
+            imagesService.filtreMoyenneur(image, n, outputFile);
+          }
+        }
+      }
+
+
+
+    };
+
+    VoidCallback onFiltreMedianClick = () async {
+      List? l = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: FiltreMedianPopup(),
+              height: deviceHeight * 0.25,
+              width: deviceWidth*0.25,
+            ),
+
+          );
+        },
+      );
+      if (l != null) {
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "media",
+        );
+
+        if (outputFile != null) {
+          if (image.runtimeType == PGMImage) {
+            imagesService.filtreMedian(image, l[0], l[1],outputFile);
+          }
+        }
+      }
+    };
+
     Function onModifyContrastClick = (Map<int,int> points) async {
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Enregister l\'image dans',
@@ -114,16 +149,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     };
 
-    Function onOptionSelected = (int i) {
-      setState((){
-        if(toolPanelSelected == i){
-          toolPanelSelected = 0;
-        }
-        else{
-          toolPanelSelected = i;
-        }
-      });
-    };
 
 
     return SafeArea(
@@ -132,14 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
           clipBehavior: Clip.none,
           children: [
 
-            //Footer Bar
-            /*footerBar(
-              deviceHeight: deviceHeight,
-              deviceWidth: deviceWidth,
-              moyenne: image != null ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
-              ecartType: image != null ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
-              show: image != null && image.runtimeType == PGMImage ,
-            ),*/ //TODO calcul de moyenne pour ppm
+
 
             Column(
               children: [
@@ -155,24 +173,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 //Screen
                 Row(
                   children: [
-                    Container(
-                      width: deviceWidth*0.2,
-                      child: Column(
-                        children: [
-
-                          toolBar(
-                            deviceWidth: deviceWidth,
-                            onOptionSelected:
-                            onOptionSelected, selected: toolPanelSelected,
-                          ),
-
-                          if(toolPanelSelected == 1)
-                            ModifyContract(onModifyContrast: onModifyContrastClick),
-                          if(toolPanelSelected == 2)
-                            ImageFilters()
-
-                        ],
-                      ),
+                    toolBar(
+                      deviceWidth: deviceWidth,
+                      deviceHeight: deviceHeight,
+                      imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick],
+                      titles: ["Filtre Moyenneur", "Filtre Median"]
                     ),
 
                     //Graphs
@@ -223,6 +229,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
               ],
             ),
+
+            //Footer Bar
+            /*footerBar(
+              deviceHeight: deviceHeight,
+              deviceWidth: deviceWidth,
+              moyenne: image != null ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
+              ecartType: image != null ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
+              show: image != null && image.runtimeType == PGMImage ,
+            ),//TODO calcul de moyenne pour ppm*/
           ],
         ),
       ),

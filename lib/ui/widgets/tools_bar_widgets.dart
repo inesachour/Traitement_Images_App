@@ -150,54 +150,62 @@ Widget PointInput({
 }
 
 
-Widget toolBarOption({
+Widget toolBarButton({
   required VoidCallback onPressed,
   required String title,
-  required bool selected
+  required double deviceWidth,
+  required bool activated
 }){
-  return Expanded(
-      flex: 1,
-      child: TextButton(
-        child: Text(
-          title,
-          style: TextStyle(
-            color: selected ? Colors.black: Colors.white,
-          ),
-        ),
-        onPressed: onPressed,
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(selected ? Colors.white: Colors.grey),
-          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.zero))
-        ),
+  return Container(
+    width: deviceWidth*0.14,
+    child: ElevatedButton(
+      child: Text(
+        title,
       ),
+      onPressed: activated ? onPressed : null,
+    ),
   );
 }
+
 
 Widget toolBar({
   required double deviceWidth,
-  required Function onOptionSelected,
-  required int selected,
+  required double deviceHeight,
+  required List<VoidCallback> onPressedList,
+  required List<String> titles,
+  required bool? imageIsPGM,
 }){
-  return Row(
-    children: [
-      toolBarOption(
-        onPressed: (){
-          onOptionSelected(1);
-        },
-        title: "Contrast",
-        selected: selected == 1,
-      ),
-
-      toolBarOption(
-        onPressed: (){
-          onOptionSelected(2);
-        },
-        title: "Filtres",
-        selected: selected == 2,
-      ),
-    ],
+  return Container(
+    width: deviceWidth*0.15,
+    height: deviceHeight*0.9,
+    color: Colors.grey.shade200,
+    child: Column(
+      children: [
+        Divider(),
+        Container(
+          width: deviceWidth,
+          child: Text("Filtres", textAlign: TextAlign.center,),
+        ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[0],
+          title: titles[0],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && imageIsPGM,
+        ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[1],
+          title: titles[1],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && imageIsPGM,
+        ),
+        Divider(),
+      ],
+    ),
   );
 }
+
 
 
 class ImageFilters extends StatefulWidget {
@@ -229,3 +237,5 @@ class _ImageFiltersState extends State<ImageFilters> {
     );
   }
 }
+
+
