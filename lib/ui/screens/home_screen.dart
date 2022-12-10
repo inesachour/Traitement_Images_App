@@ -1,9 +1,5 @@
 // ignore_for_file: prefer_function_declarations_over_variables
 
-import 'dart:collection';
-
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:expandable/expandable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:traitement_image/core/models/pgm_image.dart';
