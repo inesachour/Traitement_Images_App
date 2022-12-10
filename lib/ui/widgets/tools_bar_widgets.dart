@@ -200,6 +200,13 @@ Widget toolBar({
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && imageIsPGM,
         ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[2],
+          title: titles[2],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && imageIsPGM,
+        ),
         Divider(),
       ],
     ),

@@ -10,6 +10,7 @@ import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
+import 'package:traitement_image/ui/popups/filtre_convolution_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
@@ -139,6 +140,39 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     };
 
+    VoidCallback onFiltreConvolutionClick = () async{
+      List<List<int>>? l = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: FiltreConvolutionPopup(),
+              height: deviceHeight*0.5,
+              width: deviceWidth*0.25,
+            ),
+
+          );
+        },
+      );
+      if(l!=null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "convolution",
+        );
+
+        if(outputFile != null){
+          if(image.runtimeType == PGMImage){
+            imagesService.filtreConvolution(image, l, outputFile);
+          }
+        }
+      }
+
+
+
+    };
+
     Function onModifyContrastClick = (Map<int,int> points) async {
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Enregister l\'image dans',
@@ -177,8 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       deviceWidth: deviceWidth,
                       deviceHeight: deviceHeight,
                       imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick],
-                      titles: ["Filtre Moyenneur", "Filtre Median"]
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick],
+                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution"]
                     ),
 
                     //Graphs
@@ -231,13 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             //Footer Bar
-            /*footerBar(
+            footerBar(
               deviceHeight: deviceHeight,
               deviceWidth: deviceWidth,
-              moyenne: image != null ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
-              ecartType: image != null ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
+              moyenne: image != null && image.runtimeType == PGMImage ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
+              ecartType: image != null && image.runtimeType == PGMImage ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
               show: image != null && image.runtimeType == PGMImage ,
-            ),//TODO calcul de moyenne pour ppm*/
+            ),//TODO calcul de moyenne pour ppm
           ],
         ),
       ),

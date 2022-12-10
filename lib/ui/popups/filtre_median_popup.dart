@@ -32,6 +32,7 @@ class _FiltreMedianPopupState extends State<FiltreMedianPopup> {
                 children: [
                   TextFormField(
                     controller: nController,
+                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0) {
                         return 'Entrer un n impair';
