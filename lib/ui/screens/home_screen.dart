@@ -13,6 +13,7 @@ import 'package:traitement_image/core/models/ppm_image.dart';
 import 'package:traitement_image/ui/popups/filtre_convolution_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_median_popup.dart';
 import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
+import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
@@ -105,9 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
       }
-
-
-
     };
 
     VoidCallback onFiltreMedianClick = () async {
@@ -129,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (l != null) {
         String? outputFile = await FilePicker.platform.saveFile(
           dialogTitle: 'Enregister l\'image dans',
-          fileName: "media",
+          fileName: "median",
         );
 
         if (outputFile != null) {
@@ -168,21 +166,37 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
       }
-
-
-
     };
 
-    Function onModifyContrastClick = (Map<int,int> points) async {
-      String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Enregister l\'image dans',
-        fileName: "modified_contrast",
+    VoidCallback onModifyContrastClick = () async {
+      Map<int,int>? l = await showDialog(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: EdgeInsets.all(0),
+            content: Container(
+              child: ModifyContrastPopup(),
+              height: deviceHeight*0.5,
+              width: deviceWidth*0.25,
+            ),
+
+          );
+        },
       );
-      if(outputFile != null) {
-        contrastedImage = imagesService.modifyContrastPGM(image, points,outputFile);
+      if(l!=null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "contrast",
+        );
+
+        if(outputFile != null){
+          if(image.runtimeType == PGMImage){
+            imagesService.modifyContrastPGM(image, l, outputFile);
+          }
+        }
       }
     };
-
 
 
     return SafeArea(
@@ -190,8 +204,6 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(
           clipBehavior: Clip.none,
           children: [
-
-
 
             Column(
               children: [
@@ -211,8 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       deviceWidth: deviceWidth,
                       deviceHeight: deviceHeight,
                       imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick],
-                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution"]
+                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick],
+                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast"]
                     ),
 
                     //Graphs

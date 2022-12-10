@@ -127,7 +127,7 @@ class _FiltreConvolutionPopupState extends State<FiltreConvolutionPopup> {
                           vals.add(l);
                         }
                         if(x !=1){
-                          alertsService.showAlert(context: context, alert: "La somme doit etre égale à 1", color: Colors.red); //TODO
+                          alertsService.showAlert(context: context, alert: "La somme doit etre égale à 1", color: Colors.red); //TODO pop show twice
                         }
                         else{
                           Navigator.pop(context,vals);

@@ -85,7 +85,7 @@ class ImagesService{
     await file.writeAsString(text);
   }
 
-  Future<void> writePPM(PPMImage img, String path) async {
+  void writePPM(PPMImage img, String path) async {
 
     final File file = File("$path.ppm");
     String text = "P3\n# commentaire\n${img.ly} ${img.lx}\n${img.maxValue}";
@@ -209,7 +209,7 @@ class ImagesService{
     return histEgalise;
   }
 
-
+  //TODO
   PGMImage modifyContrastPGM(PGMImage img, Map<int,int> points, String path){
     if(!points.keys.contains(0)) points.addAll({0:0});
     if(!points.keys.contains(img.maxValue)) points.addAll({img.maxValue : img.maxValue});
@@ -241,13 +241,13 @@ class ImagesService{
     return img2;
   }
 
-
   Map<double,double> newPoint(int x0, int y0, int x1, int y1){
     double a = (y1-y0)/(x1-x0);
     double b = y1 - a*x1;
     return {a:b};
   }
 
+  //TODO
   PGMImage bruit(PGMImage img, String path){
     int r;
     var rng = Random();
@@ -368,6 +368,7 @@ class ImagesService{
     return img2;
   }
 
+  //TODO
   PGMImage filtreHighBoost(PGMImage img, PGMImage imgFiltre ,String path){ //TODO USER CHOOSE WHICH FILTER TO YA3MEL
     PGMImage img2 = PGMImage.clone(img);
     img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
@@ -381,6 +382,7 @@ class ImagesService{
     return img2;
   }
 
+  //TODO
   double signalBruit(PGMImage original, PGMImage traite){
     double moy = moyennePGM(original);
     double x =0, y=0;
@@ -394,6 +396,7 @@ class ImagesService{
     return sqrt(x/y);
   }
 
+  //TODO
   PPMImage seuillageManuel(PPMImage img, List<int> seuils, int option, String path) {
     PPMImage img2 = PPMImage.clone(img);
     img2.r = img.r.map((e)=>e).toList();
@@ -438,6 +441,7 @@ class ImagesService{
     return img2;
   }
 
+  //TODO
   PPMImage seuillageOtsu(PPMImage img, int option,String path) {
     List<int> seuils= [0,0,0];
 
@@ -450,6 +454,7 @@ class ImagesService{
 
   }
 
+  //TODO
   int seuillageOtsuCouleur(List<int> pixels, int maxValue){
 
     ///Calcul d'histogramme
@@ -480,7 +485,7 @@ class ImagesService{
     return kMax;
   }
 
-
+  //TODO
   PPMImage erosion(PPMImage img, int n, String path, bool create){
     PPMImage img2 = PPMImage.clone(img);
     int x = (n/2).floor();
@@ -492,6 +497,7 @@ class ImagesService{
     return img2;
   }
 
+  //TODO
   PPMImage dilatation(PPMImage img, int n, String path, bool create){
     PPMImage img2 = PPMImage.clone(img);
     int x = (n/2).floor();
@@ -503,6 +509,7 @@ class ImagesService{
     return img2;
   }
 
+  //TODO
   /// val =0 : erosion | val = maxValue : dilatation
   List<int> erosionDilationColor(List<int> pixels, int x, int lx , int ly, int val){
     List<int> erosion = pixels.map((e) => e).toList();
@@ -527,6 +534,7 @@ class ImagesService{
     return erosion;
   }
 
+  //TODO
   PPMImage ouverture(PPMImage img, int n, String path){
     PPMImage img2 = PPMImage.clone(img);
     img2 = dilatation(erosion(img, n, path, false), n, path, false);
@@ -535,6 +543,7 @@ class ImagesService{
     return img2;
   }
 
+  //TODO
   PPMImage fermeture(PPMImage img, int n, String path){
     PPMImage img2 = PPMImage.clone(img);
     img2 = erosion(dilatation(img, n, path, false), n, path, false);

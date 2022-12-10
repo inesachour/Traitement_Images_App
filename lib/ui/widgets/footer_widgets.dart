@@ -54,12 +54,12 @@ Widget footerBar({
         children: [
           imageInfo(
             title: "Moyenne",
-            value: show ? moyenne : null, //TODO NULL IF NO PGM
+            value: show ? moyenne : null,
           ),
           SizedBox(width: deviceWidth*0.1,),
           imageInfo(
             title: "Ecart Type",
-            value: show ? ecartType : null, //TODO NULL IF NO PGM
+            value: show ? ecartType : null,
           ),
 
         ],
