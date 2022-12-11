@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 
 Widget imageInfo({
   required String title,
-  required String? value,
+  required double? value,
+  required List<double>? values,
+  required double deviceWidth,
 }){
   return Container(
     padding: EdgeInsets.all(3),
@@ -12,7 +14,7 @@ Widget imageInfo({
     child: Row(
       children: [
         AutoSizeText(
-          "$title :",
+          "$title : ",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -20,8 +22,9 @@ Widget imageInfo({
           maxFontSize: 18,
           minFontSize: 14,
         ),
-        AutoSizeText(
-          value ?? "",
+        if(value != null)
+          AutoSizeText(
+          value.toStringAsFixed(2) ?? "",
           minFontSize: 14,
           maxFontSize: 16,
           style: TextStyle(
@@ -29,6 +32,32 @@ Widget imageInfo({
             color: Colors.white
           ),
         ),
+        if(values != null)
+          Row(
+            children: [
+              PPMImageInfo(
+                color: Colors.red,
+                title: "Rouge",
+                value: values[0].toStringAsFixed(2),
+              ),
+              SizedBox(
+                width: deviceWidth*0.005,
+              ),
+              PPMImageInfo(
+                color: Colors.green,
+                title: "Vert",
+                value: values[1].toStringAsFixed(2),
+              ),
+              SizedBox(
+                width: deviceWidth*0.005,
+              ),
+              PPMImageInfo(
+                color: Colors.blue,
+                title: "Bleu",
+                value: values[2].toStringAsFixed(2),
+              ),
+            ],
+          ),
       ],
     ),
   );
@@ -37,9 +66,10 @@ Widget imageInfo({
 Widget footerBar({
   required double deviceHeight,
   required double deviceWidth,
-  required String? moyenne,
-  required String? ecartType,
-  required bool show,
+  required double? moyennePGM,
+  required List<double>? moyennesPPM,
+  required double? ecartTypePGM,
+  required List<double>? ecartTypesPPM,
 }){
   return Positioned(
     height: deviceHeight > 500? deviceHeight*0.1 : 50,
@@ -48,23 +78,54 @@ Widget footerBar({
       decoration: BoxDecoration(
         color: Colors.grey,
       ),
-      padding: EdgeInsets.all(deviceHeight*0.03),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          imageInfo(
-            title: "Moyenne",
-            value: show ? moyenne : null,
-          ),
-          SizedBox(width: deviceWidth*0.1,),
-          imageInfo(
-            title: "Ecart Type",
-            value: show ? ecartType : null,
-          ),
+      padding: EdgeInsets.all(deviceHeight*0.02),
+      child: Expanded(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            imageInfo(
+              title: "Moyenne",
+              value: moyennePGM,
+              values: moyennesPPM,
+              deviceWidth: deviceWidth
+            ),
+            SizedBox(width: deviceWidth*0.1,),
+            imageInfo(
+              title: "Ecart Type",
+              value: ecartTypePGM,
+              values: ecartTypesPPM,
+              deviceWidth: deviceWidth
+            ),
 
-        ],
+          ],
+        ),
       ),
     ),
     bottom: 0,
+  );
+}
+
+Widget PPMImageInfo({
+  required Color color,
+  required String title,
+  required String value,
+}){
+  return Container(
+
+    padding: EdgeInsets.all(6),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(5),
+      color: color
+    ),
+    child: AutoSizeText(
+      "$title : $value",
+      minFontSize: 14,
+      maxFontSize: 16,
+      style: TextStyle(
+          overflow: TextOverflow.ellipsis,
+          color: Colors.white
+      ),
+    ),
   );
 }

@@ -453,9 +453,10 @@ class _HomeScreenState extends State<HomeScreen> {
             footerBar(
               deviceHeight: deviceHeight,
               deviceWidth: deviceWidth,
-              moyenne: image != null && image.runtimeType == PGMImage ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
-              ecartType: image != null && image.runtimeType == PGMImage ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
-              show: image != null && image.runtimeType == PGMImage ,
+              moyennePGM: image != null && image.runtimeType == PGMImage ? imagesService.moyennePGM(image) : null,
+              moyennesPPM: image != null && image.runtimeType == PPMImage ? imagesService.moyennePPM(image) : null,
+              ecartTypePGM: image != null && image.runtimeType == PGMImage ? imagesService.ecartTypePGM(image) : null,
+              ecartTypesPPM: image != null && image.runtimeType == PPMImage ? imagesService.ecartTypePPM(image) : null,
             ),//TODO calcul de moyenne pour ppm
           ],
         ),
