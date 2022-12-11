@@ -19,6 +19,7 @@ import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
 import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
 import 'package:traitement_image/ui/popups/seuillage_manuel_popup.dart';
 import 'package:traitement_image/ui/popups/seuillage_otsu_popup.dart';
+import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
 import 'package:traitement_image/ui/widgets/tools_bar_widgets.dart';
@@ -407,13 +408,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Column(
                             children: [
 
-                              /*histogramChart(
-                              data: ImagesService().histogrammePGM(image).asMap(),
-                              barWidth: 4,
-                              width: deviceWidth*0.7,
-                              height: deviceWidth*0.2,
-                              title: "Histogramme"
-                          ),*/
+                              if(image != null && image.runtimeType == PGMImage)
+                              histogramChart(
+                                  data: ImagesService().histogrammePGM(image).asMap(),
+                                  barWidth: 4,
+                                  width: deviceWidth*0.7,
+                                  height: deviceWidth*0.25,
+                                  title: "Histogramme"
+                              ),
                               //if(contrastedImage != null)
                               /*histogramChart(
                                   data: ImagesService().histogrammePGM(contrastedImage!).asMap(),

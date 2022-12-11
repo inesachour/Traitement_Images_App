@@ -25,11 +25,11 @@ Widget histogramChart({
           BarChartData(
             barGroups: data.entries.map(
                   (data) => BarChartGroupData(
-                  x: data.key,
-                  barRods: [
-                    BarChartRodData(
-                      toY: data.value.toDouble(),
-                      width: barWidth,
+                      x: data.key,
+                      barRods: [
+                        BarChartRodData(
+                          toY: data.value.toDouble(),
+                          width: barWidth,
                       borderRadius: BorderRadius.zero,
                     ),
                   ]
