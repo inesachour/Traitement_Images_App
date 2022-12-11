@@ -1,7 +1,12 @@
 // ignore_for_file: prefer_function_declarations_over_variables
 
+import 'dart:ui';
+import 'dart:typed_data';
+
+import 'package:bitmap/bitmap.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
@@ -72,7 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
       else{
         alertsService.showAlert(context: context, alert: "Aucune Image trouvée!", color: Colors.red);
       }
-      
 
 
     };

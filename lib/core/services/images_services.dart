@@ -1,10 +1,18 @@
+
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
 
-class ImagesService{
+///added netpbm package to test create images
+import 'package:netpbm/netpbm.dart' as netpbm;
+import 'package:hexcolor/hexcolor.dart';
+import 'package:bitmap/bitmap.dart';
 
+class ImagesService {
   Future<String> imageType(String path) async {
     File file = File(path);
     String type = "";
@@ -148,8 +156,24 @@ class ImagesService{
     return sqrt(val);
   }
 
-  List<int> histogrammePGM(PGMImage img){
-    List<int> hist = List.filled(img.maxValue+1,0);
+  ///ecart type PPM
+  List<double> ecartTypePPM(PPMImage img) {
+    List<double> listE = List.filled(3, 0);
+    List<double> listMoy = moyennePPM(img);
+
+    for (int i = 0; i < img.r.length; i++) {
+      listE[0] += pow(img.r[i] - listMoy[0], 2) / (img.lx * img.ly);
+      listE[1] += pow(img.g[i] - listMoy[1], 2) / (img.lx * img.ly);
+      listE[2] += pow(img.b[i] - listMoy[2], 2) / (img.lx * img.ly);
+    }
+    for (int i = 0; i < 3; i++) {
+      listE[i] = sqrt(listE[i]);
+    }
+    return listE;
+  }
+
+  List<int> histogrammePGM(PGMImage img) {
+    List<int> hist = List.filled(img.maxValue + 1, 0);
     for (int row = 0; row < img.lx; row++) {
       for (int col = 0; col < img.ly; col++) {
         hist[img.mat[row][col]] ++;
@@ -161,7 +185,7 @@ class ImagesService{
   List<int> histogramme(List<int> pixels, int maxValue){
     List<int> hist = List.filled(maxValue+1,0);
     for (int row = 0; row < pixels.length; row++) {
-      hist[pixels[row]] ++;
+      hist[pixels[row]]++;
     }
     return hist;
   }
@@ -180,7 +204,21 @@ class ImagesService{
     return [histR, histG, histB];
   }
 
-  List<int> histogrammeCumulePGM(PGMImage img){
+  ///histogram Cumulé PPM
+  List<List<int>> histogramCumulePPM(PPMImage img) {
+    List<List<int>> histCum = List.filled(3, []);
+    int histLength = img.maxValue + 1;
+    for (int i = 0; i < 3; i++) {
+      histCum[i] = histogrammePPM(img)[i];
+
+      for (int j = 1; j < histLength; j++) {
+        histCum[i][j] += histCum[i][j - 1];
+      }
+    }
+    return histCum;
+  }
+
+  List<int> histogrammeCumulePGM(PGMImage img) {
     List<int> hist = histogrammePGM(img);
     for (int i = 1; i < img.maxValue+1; i++) {
       hist[i] += hist[i-1];
@@ -188,7 +226,28 @@ class ImagesService{
     return hist;
   }
 
-  List<int> histogrammeEgalisePGM(PGMImage img){
+
+  ///histogram égalisé PPM
+  List<List<int>> histogramEgalisePPM(PPMImage img) {
+    int histLength = img.maxValue + 1;
+
+    List<List<int>> histE = List.filled(3, List.filled(histLength, 0));
+    List<List<int>> hist = histogrammePPM(img);
+    List<List<int>> histCum = histogramCumulePPM(img);
+    List<List<int>> n = List.filled(3, []);
+
+    for(int i=0;i<3;i++){
+      n[i] = histCum[i].map((e) => (img.maxValue * (e / (img.lx * img.ly))).ceil())
+          .toList();
+      for(int j=0 ; j<histLength ;j++){
+        histE[i][n[i][j]] += hist[i][j];
+      }
+    }
+
+    return histE;
+  }
+
+  List<int> histogrammeEgalisePGM(PGMImage img) {
     List<int> hist = histogrammePGM(img);
     List<int> n = histogrammeCumulePGM(img)
         .map(
@@ -199,6 +258,7 @@ class ImagesService{
     for(int i=0;i<n.length;i++){
       histEgalise[n[i]] += hist[i];
     }
+
     return histEgalise;
   }
 
