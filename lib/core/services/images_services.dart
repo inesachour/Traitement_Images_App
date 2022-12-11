@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
 
@@ -10,6 +10,7 @@ import 'package:traitement_image/core/models/ppm_image.dart';
 import 'package:netpbm/netpbm.dart' as netpbm;
 import 'package:hexcolor/hexcolor.dart';
 import 'package:bitmap/bitmap.dart';
+import 'dart:ui' as ui;
 
 class ImagesService {
   Future<String> imageType(String path) async {
@@ -227,7 +228,6 @@ class ImagesService {
     return hist;
   }
 
-
   ///histogram égalisé PPM
   List<List<int>> histogramEgalisePPM(PPMImage img) {
     int histLength = img.maxValue + 1;
@@ -237,10 +237,11 @@ class ImagesService {
     List<List<int>> histCum = histogramCumulePPM(img);
     List<List<int>> n = List.filled(3, []);
 
-    for(int i=0;i<3;i++){
-      n[i] = histCum[i].map((e) => (img.maxValue * (e / (img.lx * img.ly))).ceil())
+    for (int i = 0; i < 3; i++) {
+      n[i] = histCum[i]
+          .map((e) => (img.maxValue * (e / (img.lx * img.ly))).ceil())
           .toList();
-      for(int j=0 ; j<histLength ;j++){
+      for (int j = 0; j < histLength; j++) {
         histE[i][n[i][j]] += hist[i][j];
       }
     }
@@ -599,4 +600,89 @@ class ImagesService {
     return img2;
   }
 
+  /// test zone ///////////////////////////////////////////////////////////////////
+
+  // /// looking for a better way
+  // ///creation of images : not using it
+  // createColorfulImg(PPMImage img) {
+  //   final netpbm.Image image = netpbm.ImageColor(height: img.lx, width: img.ly);
+  //
+  //   List<int> r = img.r;
+  //   List<int> g = img.g;
+  //   List<int> b = img.b;
+  //
+  //   for (int i = 0; i < img.lx; i++) {
+  //     for (int j = 0; j < img.ly; j++) {
+  //       image[i][j] = netpbm.Color.fromHEX(ColorToHex(Color.fromRGBO(
+  //               r[i * img.ly + j], g[i * img.ly + j], b[i * img.ly + j], 1))
+  //           .toString());
+  //     }
+  //   }
+  // }
+  //
+  // /// works but still has some tweaks
+  // displayPGM(PGMImage img) {
+  //   List<int> list = [];
+  //   for (int i = 0; i < img.lx; i++) {
+  //     for (int j = 0; j < img.ly; j++) {
+  //       list.add(img.mat[i][j]);
+  //     }
+  //   }
+  //   Bitmap bitmap =
+  //       Bitmap.fromHeadless(img.ly ~/ 4, img.lx, Uint8List.fromList(list));
+  //   Bitmap resizedBitmap =
+  //       bitmap.apply(BitmapResize.to(width: img.ly, height: img.lx));
+  //   return resizedBitmap;
+  // }
+  //
+  // /// 2nd method ///
+  // displayPGM1(PGMImage img) async {
+  //   List<int> list = [];
+  //   for (int i = 0; i < img.lx; i++) {
+  //     for (int j = 0; j < img.ly; j++) {
+  //       list.add(img.mat[i][j]);
+  //     }
+  //   }
+  //
+  //   ui.Image? image;
+  //   ui.decodeImageFromPixels(
+  //       Uint8List.fromList(list), img.ly ~/ 4, img.lx, ui.PixelFormat.rgba8888,
+  //       (result) {
+  //     image = result;
+  //   });
+  //
+  //   await Future.delayed(const Duration(milliseconds: 200), () {});
+  //   print("hi");
+  //   return image;
+  // }
+
+
+
+
+  tryCreatePGM(PGMImage img, String path){
+    netpbm.Image image =  netpbm.ImageGrayscale.fromMatrix(
+      img.mat.toMatrix()
+    );
+    image.toFile(path);
+    return path;
+  }
+}
+
+/// try : if it works --> change location
+class ImageEditor extends CustomPainter {
+  ImageEditor({
+    required this.image,
+  });
+
+  ui.Image image;
+
+  @override
+  void paint(Canvas canvas, ui.Size size) {
+    canvas.drawImage(image, const Offset(0.0, 0.0), Paint());
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
 }

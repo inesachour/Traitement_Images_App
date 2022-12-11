@@ -1,7 +1,8 @@
 // ignore_for_file: prefer_function_declarations_over_variables
 
-import 'dart:ui';
+import 'dart:ui' as ui;
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:bitmap/bitmap.dart';
 import 'package:file_picker/file_picker.dart';
@@ -37,9 +38,51 @@ class _HomeScreenState extends State<HomeScreen> {
   late Function onOptionSelected;
 
 
+  // /// looking for a better way
+  // Bitmap? bitmap ;
+  // Uint8List? headedBitmap ;
+  // getImg () async {
+  //   img = await ImagesService().readPGM("C:\\Users\\Sammari Amal\\Downloads\\chat.pgm");
+  //   if(img!=null) {
+  //      bitmap = ImagesService().displayPGM(img!);
+  //      headedBitmap = bitmap!.buildHeaded();
+  //     imageForPaint = await bitmap!.buildImage();
+  //     setState(() {
+  //
+  //     });
+  //   }
+  // }
+  // getImg2nd () async {
+  //   img = await ImagesService().readPGM("C:\\Users\\Sammari Amal\\Downloads\\chat.pgm");
+  //   if(img!=null) {
+  //     imageForPaint = await ImagesService().displayPGM1(img!);
+  //     await imageForPaint?.toByteData(
+  //         format: ImageByteFormat.rawStraightRgba
+  //     );
+  //     setState(() {
+  //
+  //     });
+  //   }
+  //
+  // }
+  // ui.Image? imageForPaint ;
+
+  tryC() async {
+      img = await ImagesService().readPGM("C:\\Users\\Sammari Amal\\Downloads\\chat.pgm");
+      if(img != null) {
+        imagesService.tryCreatePGM(img!, "C:\\Users\\Sammari Amal\\Desktop\\projet traitement d'images\\try");
+      }
+
+  }
+
   @override
   initState(){
 
+
+    tryC();
+    ///looking for a better way
+    // getImg();
+    //getImg2nd();
 
     /// ////////// Changement de l'emplacement (build ---> initstate)  //////////// ///
      onReadImageClick = () async {
@@ -130,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
     };
      /// ////////////////////////////////////// ///
 
-    super.initState();
+     super.initState();
   }
 
 
@@ -139,7 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     double deviceWidth = MediaQuery.of(context).size.width;
     double deviceHeight = MediaQuery.of(context).size.height;
-
 
 
     return SafeArea(
@@ -163,8 +205,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 //Menu
                 menuBar(
-                  deviceWidth: deviceWidth!,
-                  deviceHeight: deviceHeight!,
+                  deviceWidth: deviceWidth,
+                  deviceHeight: deviceHeight,
                   onChanged: [[onReadImageClick, onWriteImageClick]],
                   options : [["Lire une image", "Ecrire une image"]],
                 ),
@@ -173,12 +215,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     Container(
-                      width: deviceWidth! * 0.2,
+                      width: deviceWidth * 0.2,
                       child: Column(
                         children: [
 
                           toolBar(
-                            deviceWidth: deviceWidth!,
+                            deviceWidth: deviceWidth,
                             onOptionSelected:
                             onOptionSelected, selected: toolPanelSelected,
                           ),
@@ -192,16 +234,38 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
+                    /// Test zone ////////////////////////////////////////
+
+                    // ///looking for a better way
+                    // if(headedBitmap != null)
+                    //   Image.memory(headedBitmap!,width: 800,height: 400,filterQuality: FilterQuality.none,),
+                    //
+                    // //Graphs
+                    //
+                    //
+                    // if(imageForPaint != null)...[
+                    //   CustomPaint(
+                    //     isComplex:true,
+                    //     foregroundPainter: ImageEditor(image: imageForPaint!),
+                    //   ),
+                    // ],
+
+
+
+                    /// /////////////////////////////////////////////////
 
 
 
 
-                    //Graphs
+
+
+
                     if(image != null && image.runtimeType == PGMImage)
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
+
 
 
                               /*histogramChart(
