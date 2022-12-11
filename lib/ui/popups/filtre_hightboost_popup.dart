@@ -17,6 +17,10 @@ class _FiltreHightBoostPopupState extends State<FiltreHightBoostPopup> {
 
   @override
   Widget build(BuildContext context) {
+
+    double deviceHeight = MediaQuery.of(context).size.height;
+    double deviceWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -25,18 +29,30 @@ class _FiltreHightBoostPopupState extends State<FiltreHightBoostPopup> {
             child: Column(
               children: [
 
-                TextFormField(
-                  controller: nController,
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 || int.parse(value) < 3) {
-                      return 'Entrer un n impair supérieur à 1';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    hintText: "N",
+                SizedBox(
+                  height: deviceHeight*0.02,
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: deviceWidth*0.1),
+                  child: TextFormField(
+                    textAlign: TextAlign.center,
+                    controller: nController,
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 || int.parse(value) < 3) {
+                        return 'Entrer un n impair supérieur à 1';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: "N",
+                    ),
                   ),
+                ),
+
+                SizedBox(
+                  height: deviceHeight*0.005,
                 ),
 
                 RadioListTile(
@@ -72,6 +88,10 @@ class _FiltreHightBoostPopupState extends State<FiltreHightBoostPopup> {
                   },
                 ),
 
+                SizedBox(
+                  height: deviceHeight*0.02,
+                ),
+
                 ElevatedButton(
                   child: Text("Confirmer"),
                   onPressed: (){
@@ -94,7 +114,7 @@ class _FiltreHightBoostPopupState extends State<FiltreHightBoostPopup> {
             right: 0,
             top: 0,
             child: IconButton(
-              icon: Icon(Icons.close),
+              icon: Icon(Icons.close, color: Colors.red,),
               onPressed: (){Navigator.pop(context, null);},
               highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,

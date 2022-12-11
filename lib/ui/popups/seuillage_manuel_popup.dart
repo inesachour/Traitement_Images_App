@@ -28,54 +28,63 @@ class _SeuillageManuelPopupState extends State<SeuillageManuelPopup> {
             key: _formKey,
             child: Column(
               children: [
-                Row(
-                  children: [
-                    SizedBox(width: deviceWidth*0.01,),
+                SizedBox(height: deviceHeight*0.01,),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: deviceWidth*0.04),
+                  child: Row(
+                    children: [
+                      SizedBox(width: deviceWidth*0.01,),
 
-                    Expanded(
-                      child: TextFormField(
-                        controller: controllers[0],
-                        validator: (value) {
-                          if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) < 1 || int.parse(value) > 255) {
-                            return 'Entrer une valeur valide';
-                          }
-                          return null;
-                        },
+                      Expanded(
+                        child: TextFormField(
+                          controller: controllers[0],
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) < 1 || int.parse(value) > 255) {
+                              return 'Entrer une valeur valide';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
 
-                    SizedBox(width: deviceWidth*0.01,),
+                      SizedBox(width: deviceWidth*0.015,),
 
-                    Expanded(
-                      child: TextFormField(
-                        controller: controllers[1],
-                        validator: (value) {
-                          if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) < 1 || int.parse(value) > 255) {
-                            return 'Entrer une valeur valide';
-                          }
-                          return null;
-                        },
+                      Expanded(
+                        child: TextFormField(
+                          textAlign: TextAlign.center,
+                          controller: controllers[1],
+                          validator: (value) {
+                            if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) < 1 || int.parse(value) > 255) {
+                              return 'Entrer une valeur valide';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
 
-                    SizedBox(width: deviceWidth*0.01,),
+                      SizedBox(width: deviceWidth*0.015,),
 
-                    Expanded(
-                      child: TextFormField(
-                        controller: controllers[2],
-                        validator: (value) {
-                          if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) < 1 || int.parse(value) > 255) {
-                            return 'Entrer une valeur valide';
-                          }
-                          return null;
-                        },
+                      Expanded(
+                        child: TextFormField(
+                          controller: controllers[2],
+                          textAlign: TextAlign.center,
+                          validator: (value) {
+                            if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) < 1 || int.parse(value) > 255) {
+                              return 'Entrer une valeur valide';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
 
-                    SizedBox(width: deviceWidth*0.01,),
+                      SizedBox(width: deviceWidth*0.01,),
 
-                  ],
+                    ],
+                  ),
                 ),
+
+                SizedBox(height: deviceHeight*0.01,),
 
                 RadioListTile(
                   title: Text("Indépendant"),
@@ -110,6 +119,8 @@ class _SeuillageManuelPopupState extends State<SeuillageManuelPopup> {
                   },
                 ),
 
+                SizedBox(height: deviceHeight*0.01,),
+
                 ElevatedButton(
                   child: Text("Confirmer"),
                   onPressed: (){
@@ -130,6 +141,7 @@ class _SeuillageManuelPopupState extends State<SeuillageManuelPopup> {
                     });
                   },
                 ),
+                SizedBox(height: deviceHeight*0.01,),
               ],
             ),
           ),
@@ -137,7 +149,7 @@ class _SeuillageManuelPopupState extends State<SeuillageManuelPopup> {
             right: 0,
             top: 0,
             child: IconButton(
-              icon: Icon(Icons.close),
+              icon: Icon(Icons.close, color: Colors.red,),
               onPressed: (){Navigator.pop(context, null);},
               highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,

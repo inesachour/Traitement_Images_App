@@ -23,22 +23,26 @@ class _FiltreMoyenneurPopupState extends State<FiltreMoyenneurPopup> {
         children: [
 
           Container(
-            padding: EdgeInsets.symmetric(horizontal: deviceWidth*0.04, vertical: deviceHeight*0.01),
+            padding: EdgeInsets.symmetric(horizontal: deviceWidth*0.02, vertical: deviceHeight*0.01),
             child: Form(
               key: _formKey,
               child: Column(
                 children: [
-                  TextFormField(
-                    controller: nController,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 || int.parse(value) < 3) {
-                        return 'Entrer un n impair supérieur à 1';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      hintText: "N",
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: deviceWidth*0.04),
+                    child: TextFormField(
+                      controller: nController,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      validator: (value) {
+                        if (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value)%2 == 0 || int.parse(value) < 3) {
+                          return 'Entrer un n impair supérieur à 1';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "N",
+                      ),
                     ),
                   ),
 
@@ -53,7 +57,7 @@ class _FiltreMoyenneurPopupState extends State<FiltreMoyenneurPopup> {
                         Navigator.pop(context,x);
                       }
                     },
-                    child: Text("Générer"),
+                    child: Text("Confirmer"),
                   ),
                 ],
               ),
@@ -64,7 +68,7 @@ class _FiltreMoyenneurPopupState extends State<FiltreMoyenneurPopup> {
             right: 0,
             top: 0,
             child: IconButton(
-              icon: Icon(Icons.close),
+              icon: Icon(Icons.close, color: Colors.red,),
               onPressed: (){Navigator.pop(context, null);},
               highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,

@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
             content: Container(
               child: FiltreMoyenneurPopup(),
               height: deviceHeight*0.18,
-              width: deviceWidth*0.2,
+              width: deviceWidth*0.1,
             ),
 
           );
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
             content: Container(
               child: FiltreMedianPopup(),
               height: deviceHeight * 0.25,
-              width: deviceWidth*0.25,
+              width: deviceWidth*0.2,
             ),
 
           );
@@ -193,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
             contentPadding: EdgeInsets.all(0),
             content: Container(
               child: FiltreHightBoostPopup(),
-              height: deviceHeight*0.3,
+              height: deviceHeight*0.4,
               width: deviceWidth*0.25,
             ),
 
@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
             content: Container(
               child: ModifyContrastPopup(),
               height: deviceHeight*0.5,
-              width: deviceWidth*0.25,
+              width: deviceWidth*0.2,
             ),
 
           );
@@ -264,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
             content: Container(
               child: SeuillageOtsuPopup(),
               height: deviceHeight*0.25,
-              width: deviceWidth*0.25,
+              width: deviceWidth*0.2,
             ),
 
           );
@@ -296,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
             contentPadding: EdgeInsets.all(0),
             content: Container(
               child: SeuillageManuelPopup(),
-              height: deviceHeight*0.32,
+              height: deviceHeight*0.35,
               width: deviceWidth*0.25,
             ),
 
@@ -330,8 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
               contentPadding: EdgeInsets.all(0),
               content: Container(
                 child: MorphologyPopup(),
-                height: deviceHeight*0.2,
-                width: deviceWidth*0.25,
+                height: deviceHeight*0.18,
+                width: deviceWidth*0.18,
               ),
 
             );

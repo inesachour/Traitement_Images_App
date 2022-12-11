@@ -16,6 +16,9 @@ class _SeuillageOtsuPopupState extends State<SeuillageOtsuPopup> {
 
   @override
   Widget build(BuildContext context) {
+
+    double deviceHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -23,6 +26,11 @@ class _SeuillageOtsuPopupState extends State<SeuillageOtsuPopup> {
             key: _formKey,
             child: Column(
               children: [
+
+                SizedBox(
+                  height: deviceHeight*0.01,
+                ),
+
                 RadioListTile(
                   title: Text("Indépendant"),
                   value: 0,
@@ -71,6 +79,9 @@ class _SeuillageOtsuPopupState extends State<SeuillageOtsuPopup> {
                     });
                   },
                 ),
+                SizedBox(
+                  height: deviceHeight*0.01,
+                ),
               ],
             ),
           ),
@@ -78,7 +89,7 @@ class _SeuillageOtsuPopupState extends State<SeuillageOtsuPopup> {
             right: 0,
             top: 0,
             child: IconButton(
-              icon: Icon(Icons.close),
+              icon: Icon(Icons.close, color: Colors.red,),
               onPressed: (){Navigator.pop(context, null);},
               highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,

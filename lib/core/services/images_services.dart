@@ -239,7 +239,6 @@ class ImagesService{
     return {a:b};
   }
 
-  //TODO
   PGMImage bruit(PGMImage img, String path){
     int r;
     var rng = Random();

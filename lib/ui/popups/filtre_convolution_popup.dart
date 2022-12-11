@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
@@ -44,10 +45,14 @@ class _FiltreConvolutionPopupState extends State<FiltreConvolutionPopup> {
               key: _formKey,
               child: Column(
                 children: [
+                  SizedBox(
+                    height: deviceHeight*0.02,
+                  ),
                   Row(
+                    mainAxisAlignment : MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        child: Icon(Icons.plus_one),
+                        child: Icon(Icons.add),
                         onPressed: (){
                           setState((){
                             n+=2;
@@ -63,8 +68,11 @@ class _FiltreConvolutionPopupState extends State<FiltreConvolutionPopup> {
                           });
                         },
                       ),
+                      AutoSizeText(
+                        "$n x $n",
+                      ),
                       ElevatedButton(
-                        child: Icon(Icons.exposure_minus_1),
+                        child: Icon(Icons.remove),
                         onPressed: (){
                           setState((){
                             if(n>3){
@@ -93,23 +101,31 @@ class _FiltreConvolutionPopupState extends State<FiltreConvolutionPopup> {
 
 
                   Expanded(
-                    child: GridView.count(
-                      crossAxisCount: n,
-                      children: List.generate(n*n, (index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: controllers[(index/n).floor()][index%n],
-                            validator: (value) {
-                              if (value == null || value.isEmpty || int.tryParse(value) == null) {
-                                return 'Entrer une valeur';
-                              }
-                              return null;
-                            },
-                          ),
-                        );
-                      }),
+                    child: Padding(
+                      padding : EdgeInsets.symmetric( horizontal: n > 3 ? deviceWidth*0.01 : deviceWidth*0.02),
+                      child: GridView.count(
+                        crossAxisCount: n,
+                        children: List.generate(n*n, (index) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric( horizontal: n > 3 ? deviceWidth*0.005 : deviceWidth*0.02),
+                            child: TextFormField(
+                              textAlign: TextAlign.center,
+                              controller: controllers[(index/n).floor()][index%n],
+                              validator: (value) {
+                                if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                                  return 'Entrer une valeur';
+                                }
+                                return null;
+                              },
+                            ),
+                          );
+                        }),
+                      ),
                     ),
+                  ),
+
+                  SizedBox(
+                    height: deviceHeight*0.02,
                   ),
 
                   ElevatedButton(
@@ -135,7 +151,11 @@ class _FiltreConvolutionPopupState extends State<FiltreConvolutionPopup> {
 
                       }
                     },
-                    child: Text("Générer"),
+                    child: Text("Confirmer"),
+                  ),
+
+                  SizedBox(
+                    height: deviceHeight*0.02,
                   ),
                 ],
               ),
@@ -146,7 +166,7 @@ class _FiltreConvolutionPopupState extends State<FiltreConvolutionPopup> {
             right: 0,
             top: 0,
             child: IconButton(
-              icon: Icon(Icons.close),
+              icon: Icon(Icons.close, color: Colors.red,),
               onPressed: (){Navigator.pop(context, null);},
               highlightColor: Colors.transparent,
               hoverColor: Colors.transparent,
