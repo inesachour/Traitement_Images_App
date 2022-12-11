@@ -18,8 +18,10 @@ import 'package:traitement_image/ui/popups/seuillage_manuel_popup.dart';
 import 'package:traitement_image/ui/popups/seuillage_otsu_popup.dart';
 import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
+import 'package:traitement_image/ui/widgets/image_editor.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
 import 'package:traitement_image/ui/widgets/tools_bar_widgets.dart';
+import 'dart:ui' as ui;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,6 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
   ImagesService imagesService = ImagesService();
   AlertsService alertsService = AlertsService();
   int toolPanelSelected = 0;
+  ui.Image? imageForPaint;
+  ui.Image? bruitForPaint;
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +57,14 @@ class _HomeScreenState extends State<HomeScreen> {
           PPMImage img = await imagesService.readPPM(result.files.single.path!);
           image = img;
           bruit = null;
+          bruitForPaint = null;
+          imageForPaint = await imagesService.displayPPM(image);
         }
         else if(extension == "pgm"){
           image = await imagesService.readPGM(result.files.single.path!);
           bruit = imagesService.bruit(image, "", false);
+          imageForPaint = await imagesService.displayPGM(image);
+          bruitForPaint = await imagesService.displayPGM(bruit!);
         }
         contrastedImage = null;
         setState((){});
@@ -414,6 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   flex: 8,
                   child: Row(
                     children: [
+
                       Expanded(
                         flex: 1,
                         child: toolBar(
@@ -436,7 +446,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
 
+                                SizedBox(height: deviceHeight*0.05,),
+
+                                if(image != null)
+                                  Row(
+                                    mainAxisAlignment : MainAxisAlignment.center,
+                                    children: [
+                                      if(imageForPaint != null)
+                                      SizedBox(
+                                        height : imageForPaint!.height.toDouble(),
+                                        width: imageForPaint!.width.toDouble(),
+                                        child: CustomPaint(
+                                          isComplex:true,
+                                          foregroundPainter: ImageEditor(image: imageForPaint!),
+                                        ),
+                                      ),
+
+                                      SizedBox(
+                                        width: deviceWidth*0.1,
+                                      ),
+
+                                      if(bruitForPaint != null)
+                                      SizedBox(
+                                        height : imageForPaint!.height.toDouble(),
+                                        width: imageForPaint!.width.toDouble(),
+                                        child: CustomPaint(
+                                          isComplex:true,
+                                          foregroundPainter: ImageEditor(image: bruitForPaint!),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
                                 SizedBox(height: deviceHeight*0.02,),
+
                                 //PGM
                                 if(image != null && image.runtimeType == PGMImage)
                                   histogramChart(

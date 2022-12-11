@@ -1,9 +1,11 @@
 
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
+import 'dart:ui' as ui;
 
 class ImagesService {
   Future<String> imageType(String path) async {
@@ -588,6 +590,52 @@ class ImagesService {
     img2 = erosion(dilatation(img, n, path, false), n, path, false);
     writePPM(img2, path);
     return img2;
+  }
+
+  displayPGM(PGMImage img) async {
+    List<int> list = [];
+    for (int i = 0; i < img.lx; i++) {
+      for (int j = 0; j < img.ly; j++) {
+        list.add(img.mat[i][j]);
+        list.add(img.mat[i][j]);
+        list.add(img.mat[i][j]);
+        list.add(img.maxValue);
+      }
+    }
+
+    ui.Image? image;
+    ui.decodeImageFromPixels(
+        Uint8List.fromList(list), img.ly, img.lx, ui.PixelFormat.rgba8888,
+            (result) {
+          image = result;
+        });
+
+    await Future.delayed(const Duration(milliseconds: 200), () {});
+    print("hi");
+    return image;
+  }
+
+  displayPPM(PPMImage img) async {
+    List<int> list = [];
+    for (int i = 0; i < img.lx; i++) {
+      for (int j = 0; j < img.ly; j++) {
+        list.add(img.r[i * img.ly + j]);
+        list.add(img.g[i * img.ly + j]);
+        list.add(img.b[i * img.ly + j]);
+        list.add(img.maxValue);
+      }
+    }
+
+    ui.Image? image;
+    ui.decodeImageFromPixels(
+        Uint8List.fromList(list), img.ly, img.lx, ui.PixelFormat.rgba8888,
+            (result) {
+          image = result;
+        });
+
+    await Future.delayed(const Duration(milliseconds: 200), () {});
+    print("hi");
+    return image;
   }
 
 }
