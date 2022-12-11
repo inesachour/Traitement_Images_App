@@ -47,7 +47,7 @@ Widget menuBar({
         menuBarButton(
           deviceHeight: deviceHeight,
           title: "Importer une image",
-          icon: Icons.upload,
+          icon: Icons.download,
           activated: true,
           onPressed: onPressed[0]
         ),
@@ -57,7 +57,7 @@ Widget menuBar({
         menuBarButton(
           deviceHeight: deviceHeight,
           title: "Exporter une image",
-          icon: Icons.download,
+          icon: Icons.upload,
           activated: imageIsPGM != null,
             onPressed: onPressed[1]
         ),
