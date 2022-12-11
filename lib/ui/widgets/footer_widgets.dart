@@ -24,7 +24,7 @@ Widget imageInfo({
         ),
         if(value != null)
           AutoSizeText(
-          value.toStringAsFixed(2) ?? "",
+          value.toStringAsFixed(2),
           minFontSize: 14,
           maxFontSize: 16,
           style: TextStyle(
@@ -70,39 +70,44 @@ Widget footerBar({
   required List<double>? moyennesPPM,
   required double? ecartTypePGM,
   required List<double>? ecartTypesPPM,
+  required double? signalBruit,
+  required bool imageIsPGM,
 }){
-  return Positioned(
-    height: deviceHeight > 500? deviceHeight*0.1 : 50,
-    child: Container(
-      width: deviceWidth,
-      decoration: BoxDecoration(
-        color: Colors.grey,
-      ),
-      padding: EdgeInsets.all(deviceHeight*0.02),
-      child: Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            imageInfo(
-              title: "Moyenne",
-              value: moyennePGM,
-              values: moyennesPPM,
-              deviceWidth: deviceWidth
-            ),
-            SizedBox(width: deviceWidth*0.1,),
-            imageInfo(
-              title: "Ecart Type",
-              value: ecartTypePGM,
-              values: ecartTypesPPM,
-              deviceWidth: deviceWidth
-            ),
-
-          ],
-        ),
-      ),
+  return Container(
+    width: deviceWidth,
+    decoration: BoxDecoration(
+      color: Colors.grey,
     ),
-    bottom: 0,
+    padding: EdgeInsets.all(deviceHeight*0.02),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        imageInfo(
+          title: "Moyenne",
+          value: moyennePGM,
+          values: moyennesPPM,
+          deviceWidth: deviceWidth
+        ),
+        SizedBox(width: deviceWidth*0.1,),
+        imageInfo(
+          title: "Ecart Type",
+          value: ecartTypePGM,
+          values: ecartTypesPPM,
+          deviceWidth: deviceWidth
+        ),
+        if(imageIsPGM)
+          SizedBox(width: deviceWidth*0.1,),
+        if(imageIsPGM)
+          imageInfo(
+              title: "Signal Bruit",
+              value: signalBruit,
+              values: null,
+              deviceWidth: deviceWidth
+          ),
+
+      ],
+    ),
   );
 }
 

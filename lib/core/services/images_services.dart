@@ -198,7 +198,7 @@ class ImagesService {
   }
 
   ///histogram Cumulé PPM
-  List<List<int>> histogramCumulePPM(PPMImage img) {
+  List<List<int>> histogrammeCumulePPM(PPMImage img) {
     List<List<int>> histCum = List.filled(3, []);
     int histLength = img.maxValue + 1;
     for (int i = 0; i < 3; i++) {
@@ -221,12 +221,12 @@ class ImagesService {
 
 
   ///histogram égalisé PPM
-  List<List<int>> histogramEgalisePPM(PPMImage img) {
+  List<List<int>> histogrammeEgalisePPM(PPMImage img) {
     int histLength = img.maxValue + 1;
 
     List<List<int>> histE = List.filled(3, List.filled(histLength, 0));
     List<List<int>> hist = histogrammePPM(img);
-    List<List<int>> histCum = histogramCumulePPM(img);
+    List<List<int>> histCum = histogrammeCumulePPM(img);
     List<List<int>> n = List.filled(3, []);
 
     for(int i=0;i<3;i++){
@@ -292,7 +292,7 @@ class ImagesService {
     return {a:b};
   }
 
-  PGMImage bruit(PGMImage img, String path){
+  PGMImage bruit(PGMImage img, String path, bool create){
     int r;
     var rng = Random();
     PGMImage img2 = PGMImage.clone(img);
@@ -307,7 +307,8 @@ class ImagesService {
         }
       }
     }
-    writePGM(img2, path);
+    if(create)
+      writePGM(img2, path);
     return img2;
   }
 

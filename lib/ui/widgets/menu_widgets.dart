@@ -115,7 +115,7 @@ Widget menuBar({
 
         menuBarButton(
             deviceHeight: deviceHeight,
-            title: "Générer bruit",
+            title: "Exporter image bruit",
             icon: Icons.image,
             activated: imageIsPGM != null && imageIsPGM,
             onPressed: onPressed[2]

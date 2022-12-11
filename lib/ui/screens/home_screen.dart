@@ -1,8 +1,6 @@
 // ignore_for_file: prefer_function_declarations_over_variables
 
 import 'dart:ui';
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,6 +31,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var image;
   PPMImage? imgSeuille;
+  PGMImage? contrastedImage;
+  PGMImage? filteredImage;
+  PGMImage? bruit;
   ImagesService imagesService = ImagesService();
   AlertsService alertsService = AlertsService();
   int toolPanelSelected = 0;
@@ -48,14 +49,16 @@ class _HomeScreenState extends State<HomeScreen> {
       if (result != null) {
         String extension = await imagesService.imageType(result.files.single.path!);
         if(extension == "ppm"){
-          PPMImage img = await  imagesService.readPPM(result.files.single.path!);
+          PPMImage img = await imagesService.readPPM(result.files.single.path!);
           image = img;
+          bruit = null;
         }
         else if(extension == "pgm"){
           image = await imagesService.readPGM(result.files.single.path!);
+          bruit = imagesService.bruit(image, "", false);
         }
+        contrastedImage = null;
         setState((){});
-
       }
     };
 
@@ -89,7 +92,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
         if(outputFile != null){
           if(image.runtimeType == PGMImage){
-            imagesService.bruit(image, outputFile);
+            if(bruit == null){
+              setState(() {
+                bruit = imagesService.bruit(image, outputFile, true);
+              });
+            }
+            else{
+              imagesService.writePGM(bruit!, outputFile);
+            }
           }
         }
       }
@@ -105,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             contentPadding: EdgeInsets.all(0),
-            content: Container(
+            content: SizedBox(
               child: FiltreMoyenneurPopup(),
               height: deviceHeight*0.18,
               width: deviceWidth*0.1,
@@ -122,7 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if(outputFile != null){
           if(image.runtimeType == PGMImage){
-            imagesService.filtreMoyenneur(image, n, outputFile, true);
+            setState(() {
+              filteredImage = imagesService.filtreMoyenneur(bruit!, n, outputFile, true);
+            });
           }
         }
       }
@@ -131,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
     VoidCallback onFiltreMedianClick = () async {
       List? l = await showDialog(
         context: context,
-        barrierDismissible: false, // user must tap button!
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
             contentPadding: EdgeInsets.all(0),
@@ -152,7 +164,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (outputFile != null) {
           if (image.runtimeType == PGMImage) {
-            imagesService.filtreMedian(image, l[0], l[1],outputFile, true);
+            setState(() {
+              filteredImage = imagesService.filtreMedian(bruit!, l[0], l[1],outputFile, true);
+
+            });
           }
         }
       }
@@ -252,7 +267,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if(outputFile != null){
           if(image.runtimeType == PGMImage){
-            imagesService.modifyContrastPGM(image, l, outputFile);
+
+            setState(() {
+              contrastedImage = imagesService.modifyContrastPGM(image, l, outputFile);
+            });
           }
         }
       }
@@ -348,8 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
 
           if(outputFile != null){
-            if(imgSeuille == null)
-              imgSeuille = imagesService.seuillageOtsu(image, 0, "",false);
+            imgSeuille ??= imagesService.seuillageOtsu(image, 0, "",false);
             if(image.runtimeType == PPMImage){
               if(choice.toLowerCase() == "erosion"){
                 imagesService.erosion(imgSeuille!, n, outputFile, true);
@@ -374,92 +391,147 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SafeArea(
       child: Scaffold(
-        body: Stack(
-          clipBehavior: Clip.none,
+        body: Column(
+          //clipBehavior: Clip.none,
           children: [
 
-            Column(
+            Expanded(flex: 10,child:Column(
               children: [
-
                 //Menu
-                menuBar(
-                  deviceWidth: deviceWidth,
-                  deviceHeight: deviceHeight,
-                  onPressed: [onReadImageClick, onWriteImageClick, onBruitClick],
-                  imageIsPGM: image != null ? (image.runtimeType == PGMImage ? true : false) : null, //TODO BRUIT FOR PPM ??
+                Expanded(
+                  flex: 1,
+                  child: menuBar(
+                    deviceWidth: deviceWidth,
+                    deviceHeight: deviceHeight,
+                    onPressed: [onReadImageClick, onWriteImageClick, onBruitClick],
+                    imageIsPGM: image != null ? (image.runtimeType == PGMImage ? true : false) : null,
+                  ),
                 ),
 
+
                 //Screen
-                Row(
-                  children: [
-                    toolBar(
-                      deviceWidth: deviceWidth,
-                      deviceHeight: deviceHeight,
-                      imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                      onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onFiltreHighBoostClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
-                      titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Filtre High-Boost", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
-                    ),
+                Expanded(
+                  flex: 8,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: toolBar(
+                            deviceWidth: deviceWidth,
+                            deviceHeight: deviceHeight,
+                            imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
+                            onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onFiltreHighBoostClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
+                            titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Filtre High-Boost", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
+                        ),
+                      ),
+
 
                     //Graphs
-                    if(image != null && image.runtimeType == PGMImage)
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
+                        Expanded(
+                          flex: 5,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
 
-                              if(image != null && image.runtimeType == PGMImage)
-                              histogramChart(
-                                  data: ImagesService().histogrammePGM(image).asMap(),
-                                  barWidth: 4,
-                                  width: deviceWidth*0.7,
-                                  height: deviceWidth*0.25,
-                                  title: "Histogramme"
-                              ),
+                                SizedBox(height: deviceHeight*0.02,),
+                                //PGM
+                                if(image != null && image.runtimeType == PGMImage)
+                                  histogramChart(
+                                    data: imagesService.histogrammePGM(image).asMap(),
+                                    barWidth: 10,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.25,
+                                    title: "Histogramme",
+                                  ),
 
-                              //if(contrastedImage != null)
-                              /*histogramChart(
-                                  data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
-                                  barWidth: 4,
-                                  width: deviceWidth*0.7,
-                                  height: deviceWidth*0.2,
-                                  title: "Histogramme Apres modification de Contrast"
-                              ),*/
+                                if(image != null && image.runtimeType == PGMImage)
+                                  histogramChart(
+                                    data: ImagesService().histogrammeCumulePGM(image).asMap(),
+                                    barWidth: 4,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.4,
+                                    title: "Histogramme Cumulé",
+                                  ),
 
-                              /*histogramChart(
-                                  data: ImagesService().histogrammeCumulePGM(image).asMap(),
-                                  barWidth: 4,
-                                  width: deviceWidth,
-                                  height: deviceWidth*0.4,
-                                  title: "Histogramme Cumulé"
-                              ),*/
+                                if(image != null && image.runtimeType == PGMImage)
+                                  histogramChart(
+                                    data: ImagesService().histogrammeEgalisePGM(image).asMap(),
+                                    barWidth: 4,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.4,
+                                    title: "Histogramme Egalisé",
+                                  ),
 
-                              /*histogramChart(
-                                  data: ImagesService().histogrammeEgalisePGM(image).asMap(),
-                                  barWidth: 4,
-                                  width: deviceWidth,
-                                  height: deviceWidth*0.4,
-                                  title: "Histogramme Egalisé"
-                              ),*/
+                                if(contrastedImage != null)
+                                  histogramChart(
+                                    data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
+                                    barWidth: 4,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.2,
+                                    title: "Histogramme Apres modification de Contrast",
+                                  ),
+
+
+                              //PPM
+                              if(image != null && image.runtimeType == PPMImage)
+                                histogramPPMChart(
+                                    datas: imagesService.histogrammePPM(image),
+                                    barWidth: 10,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.25,
+                                    titles: [ "Histogramme Rouge", "Histogramme Vert", "Histogramme Bleu"]
+                                ),
+
+                                if(image != null && image.runtimeType == PPMImage)
+                                  histogramPPMChart(
+                                      datas: imagesService.histogrammeCumulePPM(image),
+                                      barWidth: 10,
+                                      width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                      height: deviceWidth*0.25,
+                                      titles: [ "Histogramme Cumulé Rouge", "Histogramme Cumulé Vert", "Histogramme Cumulé Bleu"]
+                                  ),
+
+                                if(image != null && image.runtimeType == PPMImage)
+                                  histogramPPMChart(
+                                      datas: imagesService.histogrammeEgalisePPM(image),
+                                      barWidth: 10,
+                                      width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                      height: deviceWidth*0.25,
+                                      titles: [ "Histogramme Egalisé Rouge", "Histogramme Egalisé Vert", "Histogramme Egalisé Bleu"]
+                                  ),
+
+                                SizedBox(height: deviceHeight*0.02,)
+
                             ],
                           ),
                         ),
                       ),
                   ],
-                ),
+                ), )
+
 
 
               ],
-            ),
+            ), ),
 
             //Footer Bar
-            footerBar(
-              deviceHeight: deviceHeight,
-              deviceWidth: deviceWidth,
-              moyennePGM: image != null && image.runtimeType == PGMImage ? imagesService.moyennePGM(image) : null,
-              moyennesPPM: image != null && image.runtimeType == PPMImage ? imagesService.moyennePPM(image) : null,
-              ecartTypePGM: image != null && image.runtimeType == PGMImage ? imagesService.ecartTypePGM(image) : null,
-              ecartTypesPPM: image != null && image.runtimeType == PPMImage ? imagesService.ecartTypePPM(image) : null,
-            ),//TODO calcul de moyenne pour ppm
+            Expanded(
+              flex: 1,
+              child: footerBar(
+                deviceHeight: deviceHeight,
+                deviceWidth: deviceWidth,
+                moyennePGM: image != null && image.runtimeType == PGMImage ? imagesService.moyennePGM(image) : null,
+                moyennesPPM: image != null && image.runtimeType == PPMImage ? imagesService.moyennePPM(image) : null,
+                ecartTypePGM: image != null && image.runtimeType == PGMImage ? imagesService.ecartTypePGM(image) : null,
+                ecartTypesPPM: image != null && image.runtimeType == PPMImage ? imagesService.ecartTypePPM(image) : null,
+                imageIsPGM: image != null && image.runtimeType == PGMImage,
+                signalBruit: (image!= null && image.runtimeType == PGMImage && filteredImage!=null) ? imagesService.signalBruit(image, filteredImage!) : null
+              ),
+            ),
+
           ],
         ),
       ),
