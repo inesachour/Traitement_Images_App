@@ -27,49 +27,6 @@ mainButton({
   );
 }
 
-/*Widget menuDropDownButton({
-  required String title,
-  required List<VoidCallback>? onChanged,
-  required List<String> options,
-  bool enabled = true,
-  required double deviceWidth
-}){
-  int i =0;
-  return  DropdownButtonHideUnderline(
-    child: DropdownButton2(
-      customButton: AutoSizeText(
-        title,
-        style: TextStyle(
-          color: enabled ? Colors.white : Colors.grey,
-        ),
-        minFontSize: 16,
-        maxFontSize: 18,
-      ),
-      items: onChanged != null ? options.map((e) {
-        return DropdownMenuItem(
-          child: AutoSizeText(
-            e,
-            minFontSize: 12,
-            maxFontSize: 14,
-          ),
-          value: i++,);
-      }).toList() : null,
-      onChanged: (int? val){
-        if(onChanged != null && val != null) onChanged[val]();
-      },
-      dropdownWidth: deviceWidth > 1000 ? deviceWidth * 0.18 : deviceWidth * 0.5,
-      dropdownDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        color: Colors.white,
-      ),
-      dropdownElevation: 8,
-      buttonDecoration: BoxDecoration(
-        color: Colors.red,
-      )
-    ),
-  );
-}*/
-
 Widget menuBar({
   required double deviceWidth,
   required double deviceHeight,
@@ -85,12 +42,7 @@ Widget menuBar({
 
         SizedBox(width: deviceWidth*0.02,),
 
-        /*menuDropDownButton(
-          title: "Fichier",
-          deviceWidth: deviceWidth,
-          onChanged: onChanged[0],
-          options: options[0],
-        ),*/
+
 
         menuBarButton(
           deviceHeight: deviceHeight,
@@ -151,5 +103,34 @@ Widget menuBarButton({
       icon: Icon(icon, color: activated ? Colors.blue : Colors.white,),
       onPressed: activated ? onPressed : null,
     ),
+  );
+}
+
+
+Widget displayOtptions({
+  required List<String> labels,
+  required List<bool> activated,
+  required List<VoidCallback> onPressed,
+}){
+
+  List<Widget> btns = [];
+  for(int i=0; i<labels.length; i++){
+    btns.add(
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          child: Text(labels[i]),
+          onPressed: onPressed[i],
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(activated[i] ? Colors.blue : Colors.grey),
+          ),
+        ),
+      ),
+    );
+  }
+
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: btns,
   );
 }

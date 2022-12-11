@@ -41,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int toolPanelSelected = 0;
   ui.Image? imageForPaint;
   ui.Image? bruitForPaint;
+  List<bool> showHists = [true, false, false];
 
 
   @override
@@ -67,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           bruitForPaint = await imagesService.displayPGM(bruit!);
         }
         contrastedImage = null;
+        showHists = [true, false, false];
         setState((){});
       }
     };
@@ -396,7 +398,13 @@ class _HomeScreenState extends State<HomeScreen> {
       };
     }
 
-
+    VoidCallback onHistogramOptionClick(int i){
+      return (){
+        setState(() {
+          showHists[i] = !showHists[i];
+        });
+      };
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -437,19 +445,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
                     //Graphs
-                        Expanded(
-                          flex: 5,
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                      Expanded(
+                        flex: 5,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            children: [
+                              if(image != null)
+                                displayOtptions(
+                                  labels: ["Histogramme","Histogramme Cumulé", "Histogramme Egalisé"],
+                                  activated: showHists,
+                                  onPressed: [onHistogramOptionClick(0), onHistogramOptionClick(1), onHistogramOptionClick(2)],
+                                ),
 
-                                SizedBox(height: deviceHeight*0.05,),
+                              SizedBox(height: deviceHeight*0.05,),
 
-                                if(image != null)
-                                  Row(
+                              if(image != null)
+                                Row(
                                     mainAxisAlignment : MainAxisAlignment.center,
                                     children: [
                                       if(imageForPaint != null)
@@ -462,6 +474,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ),
 
+                                      if(bruitForPaint != null)
                                       SizedBox(
                                         width: deviceWidth*0.1,
                                       ),
@@ -478,48 +491,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
 
-                                SizedBox(height: deviceHeight*0.02,),
+                              SizedBox(height: deviceHeight*0.02,),
 
                                 //PGM
-                                if(image != null && image.runtimeType == PGMImage)
-                                  histogramChart(
-                                    data: imagesService.histogrammePGM(image).asMap(),
-                                    barWidth: 10,
-                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
-                                    height: deviceWidth*0.25,
-                                    title: "Histogramme",
-                                  ),
+                              if(image != null && image.runtimeType == PGMImage && showHists[0])
+                                histogramChart(
+                                  data: imagesService.histogrammePGM(image).asMap(),
+                                  barWidth: 10,
+                                  width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                  height: deviceWidth*0.25,
+                                  title: "Histogramme",
+                                ),
 
-                                if(image != null && image.runtimeType == PGMImage)
-                                  histogramChart(
-                                    data: ImagesService().histogrammeCumulePGM(image).asMap(),
-                                    barWidth: 4,
-                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
-                                    height: deviceWidth*0.4,
-                                    title: "Histogramme Cumulé",
-                                  ),
+                              if(image != null && image.runtimeType == PGMImage && showHists[1])
+                                histogramChart(
+                                  data: ImagesService().histogrammeCumulePGM(image).asMap(),
+                                  barWidth: 4,
+                                  width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                  height: deviceWidth*0.4,
+                                  title: "Histogramme Cumulé",
+                                ),
 
-                                if(image != null && image.runtimeType == PGMImage)
-                                  histogramChart(
-                                    data: ImagesService().histogrammeEgalisePGM(image).asMap(),
-                                    barWidth: 4,
-                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
-                                    height: deviceWidth*0.4,
-                                    title: "Histogramme Egalisé",
-                                  ),
+                              if(image != null && image.runtimeType == PGMImage && showHists[2])
+                                histogramChart(
+                                  data: ImagesService().histogrammeEgalisePGM(image).asMap(),
+                                  barWidth: 4,
+                                  width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                  height: deviceWidth*0.4,
+                                  title: "Histogramme Egalisé",
+                                ),
 
-                                if(contrastedImage != null)
-                                  histogramChart(
-                                    data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
-                                    barWidth: 4,
-                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
-                                    height: deviceWidth*0.2,
-                                    title: "Histogramme Apres modification de Contrast",
-                                  ),
+                              if(contrastedImage != null)
+                                histogramChart(
+                                  data: ImagesService().histogrammePGM(contrastedImage!).asMap(),
+                                  barWidth: 4,
+                                  width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                  height: deviceWidth*0.2,
+                                  title: "Histogramme Apres modification de Contrast",
+                                ),
 
 
                               //PPM
-                              if(image != null && image.runtimeType == PPMImage)
+                              if(image != null && image.runtimeType == PPMImage && showHists[0])
                                 histogramPPMChart(
                                     datas: imagesService.histogrammePPM(image),
                                     barWidth: 10,
@@ -528,25 +541,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                     titles: [ "Histogramme Rouge", "Histogramme Vert", "Histogramme Bleu"]
                                 ),
 
-                                if(image != null && image.runtimeType == PPMImage)
-                                  histogramPPMChart(
-                                      datas: imagesService.histogrammeCumulePPM(image),
-                                      barWidth: 10,
-                                      width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
-                                      height: deviceWidth*0.25,
-                                      titles: [ "Histogramme Cumulé Rouge", "Histogramme Cumulé Vert", "Histogramme Cumulé Bleu"]
-                                  ),
+                              if(image != null && image.runtimeType == PPMImage && showHists[1])
+                                histogramPPMChart(
+                                    datas: imagesService.histogrammeCumulePPM(image),
+                                    barWidth: 10,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.25,
+                                    titles: [ "Histogramme Cumulé Rouge", "Histogramme Cumulé Vert", "Histogramme Cumulé Bleu"]
+                                ),
 
-                                if(image != null && image.runtimeType == PPMImage)
-                                  histogramPPMChart(
-                                      datas: imagesService.histogrammeEgalisePPM(image),
-                                      barWidth: 10,
-                                      width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
-                                      height: deviceWidth*0.25,
-                                      titles: [ "Histogramme Egalisé Rouge", "Histogramme Egalisé Vert", "Histogramme Egalisé Bleu"]
-                                  ),
+                              if(image != null && image.runtimeType == PPMImage && showHists[2])
+                                histogramPPMChart(
+                                    datas: imagesService.histogrammeEgalisePPM(image),
+                                    barWidth: 10,
+                                    width: image.lx*image.ly > 200 ? image.lx*image.ly*deviceWidth*0.000055 : deviceWidth*0.8,
+                                    height: deviceWidth*0.25,
+                                    titles: [ "Histogramme Egalisé Rouge", "Histogramme Egalisé Vert", "Histogramme Egalisé Bleu"]
+                                ),
 
-                                SizedBox(height: deviceHeight*0.02,)
+                              SizedBox(height: deviceHeight*0.02,)
 
                             ],
                           ),
