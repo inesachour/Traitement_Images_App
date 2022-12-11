@@ -1,19 +1,20 @@
 // ignore_for_file: prefer_function_declarations_over_variables
 
-import 'dart:collection';
+import 'dart:ui';
+import 'dart:typed_data';
 
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:expandable/expandable.dart';
+import 'package:bitmap/bitmap.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/services/alerts_service.dart';
 import 'package:traitement_image/core/services/images_services.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
-import 'package:traitement_image/ui/widgets/charts_widgets.dart';
-import 'package:traitement_image/ui/widgets/footer_widgets.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
 import 'package:traitement_image/ui/widgets/tools_bar_widgets.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -28,14 +29,20 @@ class _HomeScreenState extends State<HomeScreen> {
   ImagesService imagesService = ImagesService();
   AlertsService alertsService = AlertsService();
   int toolPanelSelected = 0;
+  PGMImage? img;
+
+  late VoidCallback onReadImageClick;
+  late VoidCallback onWriteImageClick;
+  late Function onModifyContrastClick;
+  late Function onOptionSelected;
+
 
   @override
-  Widget build(BuildContext context) {
+  initState(){
 
-    double deviceWidth = MediaQuery.of(context).size.width;
-    double deviceHeight = MediaQuery.of(context).size.height;
 
-    VoidCallback onReadImageClick = () async {
+    /// ////////// Changement de l'emplacement (build ---> initstate)  //////////// ///
+     onReadImageClick = () async {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
       if (result != null) {
         String extension = await imagesService.imageType(result.files.single.path!);
@@ -80,8 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       }
     };
-
-    VoidCallback onWriteImageClick = () async {
+     onWriteImageClick = () async {
       if(image != null){
         String? outputFile = await FilePicker.platform.saveFile(
           dialogTitle: 'Enregister l\'image dans',
@@ -99,12 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
       else{
         alertsService.showAlert(context: context, alert: "Aucune Image trouvée!", color: Colors.red);
       }
-      
+
 
 
     };
-
-    Function onModifyContrastClick = (Map<int,int> points) async {
+     onModifyContrastClick = (Map<int,int> points) async {
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Enregister l\'image dans',
         fileName: "modified_contrast",
@@ -113,8 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
         contrastedImage = imagesService.modifyContrastPGM(image, points,outputFile);
       }
     };
-
-    Function onOptionSelected = (int i) {
+     onOptionSelected = (int i) {
       setState((){
         if(toolPanelSelected == i){
           toolPanelSelected = 0;
@@ -124,6 +128,18 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
     };
+     /// ////////////////////////////////////// ///
+
+    super.initState();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    double deviceWidth = MediaQuery.of(context).size.width;
+    double deviceHeight = MediaQuery.of(context).size.height;
+
 
 
     return SafeArea(
@@ -139,15 +155,16 @@ class _HomeScreenState extends State<HomeScreen> {
               moyenne: image != null ? ImagesService().moyennePGM(image).toStringAsFixed(2) : null,
               ecartType: image != null ? ImagesService().ecartTypePGM(image).toStringAsFixed(2) : null,
               show: image != null && image.runtimeType == PGMImage ,
-            ),*/ //TODO calcul de moyenne pour ppm
+            ),*/
+            //TODO calcul de moyenne pour ppm
 
             Column(
               children: [
 
                 //Menu
                 menuBar(
-                  deviceWidth: deviceWidth,
-                  deviceHeight: deviceHeight,
+                  deviceWidth: deviceWidth!,
+                  deviceHeight: deviceHeight!,
                   onChanged: [[onReadImageClick, onWriteImageClick]],
                   options : [["Lire une image", "Ecrire une image"]],
                 ),
@@ -156,12 +173,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     Container(
-                      width: deviceWidth*0.2,
+                      width: deviceWidth! * 0.2,
                       child: Column(
                         children: [
 
                           toolBar(
-                            deviceWidth: deviceWidth,
+                            deviceWidth: deviceWidth!,
                             onOptionSelected:
                             onOptionSelected, selected: toolPanelSelected,
                           ),
@@ -175,12 +192,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
+
+
+
+
                     //Graphs
                     if(image != null && image.runtimeType == PGMImage)
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
                             children: [
+
 
                               /*histogramChart(
                               data: ImagesService().histogrammePGM(image).asMap(),
