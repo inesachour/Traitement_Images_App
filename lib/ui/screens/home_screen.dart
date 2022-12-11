@@ -14,7 +14,6 @@ import 'package:traitement_image/ui/popups/filtre_moyenneur_popup.dart';
 import 'package:traitement_image/ui/popups/modify_contrast_popup.dart';
 import 'package:traitement_image/ui/popups/seuillage_manuel_popup.dart';
 import 'package:traitement_image/ui/popups/seuillage_otsu_popup.dart';
-import 'package:traitement_image/ui/widgets/charts_widgets.dart';
 import 'package:traitement_image/ui/widgets/footer_widgets.dart';
 import 'package:traitement_image/ui/widgets/menu_widgets.dart';
 import 'package:traitement_image/ui/widgets/tools_bar_widgets.dart';
@@ -76,6 +75,23 @@ class _HomeScreenState extends State<HomeScreen> {
       
 
 
+    };
+
+    VoidCallback onBruitClick = () async {
+      if(image != null){
+        String? outputFile = await FilePicker.platform.saveFile(
+          dialogTitle: 'Enregister l\'image dans',
+          fileName: "bruit",
+        );
+        if(outputFile != null){
+          if(image.runtimeType == PGMImage){
+            imagesService.bruit(image, outputFile);
+          }
+        }
+      }
+      else{
+        alertsService.showAlert(context: context, alert: "Aucune Image trouvée!", color: Colors.red);
+      }
     };
 
     VoidCallback onFiltreMoyenneurClick = () async{
@@ -365,8 +381,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 menuBar(
                   deviceWidth: deviceWidth,
                   deviceHeight: deviceHeight,
-                  onChanged: [[onReadImageClick, onWriteImageClick]],
-                  options : [["Lire une image", "Ecrire une image"]],
+                  onPressed: [onReadImageClick, onWriteImageClick, onBruitClick],
+                  imageIsPGM: image != null ? (image.runtimeType == PGMImage ? true : false) : null, //TODO BRUIT FOR PPM ??
                 ),
 
                 //Screen

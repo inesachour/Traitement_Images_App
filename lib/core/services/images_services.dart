@@ -1,7 +1,5 @@
-
 import 'dart:io';
 import 'dart:math';
-
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
 
@@ -364,7 +362,7 @@ class ImagesService{
     return img2;
   }
 
-  PGMImage filtreHighBoost(PGMImage img, PGMImage imgFiltre ,String path){ //TODO USER CHOOSE WHICH FILTER TO YA3MEL
+  PGMImage filtreHighBoost(PGMImage img, PGMImage imgFiltre ,String path){
     PGMImage img2 = PGMImage.clone(img);
     img2.mat = img.mat.map((item) => item.map((e) => e).toList()).toList();
     for(int row =0; row <img.lx; row++) {

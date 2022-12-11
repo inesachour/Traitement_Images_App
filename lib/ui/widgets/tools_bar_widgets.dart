@@ -104,6 +104,14 @@ Widget toolBar({
           activated: imageIsPGM != null && !imageIsPGM,
         ),
         SizedBox(height: deviceHeight*0.01,),
+        Divider(),
+
+        ///Morphologie
+        Container(
+          width: deviceWidth,
+          child: Text("Morphologie", textAlign: TextAlign.center,),
+        ),
+        SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
           onPressed: onPressedList[7],
           title: titles[7],
