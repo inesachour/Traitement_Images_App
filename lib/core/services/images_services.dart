@@ -130,11 +130,18 @@ class ImagesService {
 
   double moyennePPMFromHist(List<int> hist,int start, int end){
     double moy = 0;
+    int total =0;
     for(int i=start; i<= end;i++ ){
-      moy += hist[i];
+      moy += i*hist[i];
+      total += hist[i];
     }
 
-    moy = moy/ (end-start+1);
+    if(total != 0){
+      moy = moy/ total;
+    }
+    else {
+      moy = 0;
+    }
 
     return moy;
   }
@@ -453,7 +460,7 @@ class ImagesService {
     for(int row =0; row < img.lx; row++){
       for (int col = 0; col < img.ly; col++) {
         int x = row * img.ly + col;
-        if(option ==0){
+        if(option == 0){
           img2.r[x] = (img.r[x] > seuils[0]) ? img2.maxValue : 0;
           img2.g[x] = (img.g[x] > seuils[1]) ? img2.maxValue : 0;
           img2.b[x] = (img.b[x] > seuils[2]) ? img2.maxValue : 0;
@@ -493,9 +500,9 @@ class ImagesService {
   PPMImage seuillageOtsu(PPMImage img, int option,String path, bool create) {
     List<int> seuils= [0,0,0];
 
-    seuils[0] = seuillageOtsuCouleur(img.r, img.maxValue);
-    seuils[1] = seuillageOtsuCouleur(img.g, img.maxValue);
-    seuils[2] = seuillageOtsuCouleur(img.b, img.maxValue);
+    seuils[0] = seuillageOtsuCouleur2(img.r, img.maxValue);
+    seuils[1] = seuillageOtsuCouleur2(img.g, img.maxValue);
+    seuils[2] = seuillageOtsuCouleur2(img.b, img.maxValue);
 
     return seuillageManuel(img, seuils, option, path, create);
 
@@ -638,4 +645,53 @@ class ImagesService {
     return image;
   }
 
+  int seuillageOtsuCouleur2(List<int> pixels, int maxValue){
+    List<int> hist = histogramme(pixels, maxValue).toList();
+    List<double> o = List.filled(hist.length, 0);
+    for(int i=0; i<hist.length; i++){
+      o[i] = hist[i]/pixels.length;
+    }
+    List<double> w = List.filled(hist.length, 0);
+    List<double> u = List.filled(hist.length, 0);
+    for(int i=0;i<hist.length;i++){
+      w[i] = z(o,i);
+      u[i] = f(o,i);
+    }
+    double uT = f(o,256);
+    double max = -1;
+    int seuil_max = 0;
+    for(int i =0;i<hist.length;i++){
+      double variance = vark(uT,w[i],u[i]);
+      if(variance > max){
+        max = variance;
+        seuil_max = i;
+    }
+    }
+    return seuil_max;
+  }
+
+  double z(List<double> hist, int k){
+    double z=0;
+    for(int i =0; i<k;i++){
+      z+= hist[i];
+    }
+    return z;
+  }
+
+  double f(List<double> hist, int k){
+    double f = 0;
+    for(int i =0; i<k;i++){
+      f+= i*hist[i];
+    }
+    return f;
+  }
+
+  double vark(double ut, double wk, double uk){
+    if(wk ==0){
+      return -1;
+    }
+    else{
+      return ((ut*wk-uk)*(ut*wk-uk)/(wk*(1-wk)));
+    }
+  }
 }
