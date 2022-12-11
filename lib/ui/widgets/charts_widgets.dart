@@ -17,24 +17,27 @@ Widget histogramChart({
         minFontSize: 12,
         maxFontSize: 16,
       ),
-      Container(
-        width: width,
-        height: height,
-        margin: EdgeInsets.all(20),
-        child: BarChart(
-          BarChartData(
-            barGroups: data.entries.map(
-                  (data) => BarChartGroupData(
-                      x: data.key,
-                      barRods: [
-                        BarChartRodData(
-                          toY: data.value.toDouble(),
-                          width: barWidth,
-                      borderRadius: BorderRadius.zero,
-                    ),
-                  ]
-              ) ,
-            ).toList(),
+      SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          width: width * 6.2,
+          height: height,
+          margin: const EdgeInsets.all(20),
+          child: BarChart(
+            BarChartData(
+              barGroups: data.entries.map(
+                    (data) => BarChartGroupData(
+                        x: data.key,
+                        barRods: [
+                          BarChartRodData(
+                            toY: data.value.toDouble(),
+                            width: barWidth,
+                        borderRadius: BorderRadius.zero,
+                      ),
+                    ]
+                ) ,
+              ).toList(),
+            ),
           ),
         ),
       ),

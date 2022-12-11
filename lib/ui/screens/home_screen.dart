@@ -3,7 +3,6 @@
 import 'dart:ui';
 import 'dart:typed_data';
 
-import 'package:bitmap/bitmap.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -416,6 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   height: deviceWidth*0.25,
                                   title: "Histogramme"
                               ),
+
                               //if(contrastedImage != null)
                               /*histogramChart(
                                   data: ImagesService().histogrammePGM(contrastedImage!).asMap(),

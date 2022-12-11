@@ -1,16 +1,9 @@
 
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:traitement_image/core/models/pgm_image.dart';
 import 'package:traitement_image/core/models/ppm_image.dart';
-
-///added netpbm package to test create images
-import 'package:netpbm/netpbm.dart' as netpbm;
-import 'package:hexcolor/hexcolor.dart';
-import 'package:bitmap/bitmap.dart';
 
 class ImagesService {
   Future<String> imageType(String path) async {
