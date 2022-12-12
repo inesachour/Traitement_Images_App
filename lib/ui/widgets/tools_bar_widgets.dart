@@ -59,13 +59,13 @@ Widget toolBar({
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && imageIsPGM,
         ),
-        SizedBox(height: deviceHeight*0.01,),
+        /*SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
           onPressed: onPressedList[3],
           title: titles[3],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && imageIsPGM,
-        ),
+        ),*/
         SizedBox(height: deviceHeight*0.01,),
         Divider(),
 
@@ -76,8 +76,8 @@ Widget toolBar({
         ),
         SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
-          onPressed: onPressedList[4],
-          title: titles[4],
+          onPressed: onPressedList[3],
+          title: titles[3],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && imageIsPGM,
         ),
@@ -91,15 +91,15 @@ Widget toolBar({
         ),
         SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
-          onPressed: onPressedList[5],
-          title: titles[5],
+          onPressed: onPressedList[4],
+          title: titles[4],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && !imageIsPGM,
         ),
         SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
-          onPressed: onPressedList[6],
-          title: titles[6],
+          onPressed: onPressedList[5],
+          title: titles[5],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && !imageIsPGM,
         ),
@@ -110,6 +110,13 @@ Widget toolBar({
         Container(
           width: deviceWidth,
           child: Text("Morphologie", textAlign: TextAlign.center,),
+        ),
+        SizedBox(height: deviceHeight*0.01,),
+        toolBarButton(
+          onPressed: onPressedList[6],
+          title: titles[6],
+          deviceWidth: deviceWidth,
+          activated: imageIsPGM != null && !imageIsPGM,
         ),
         SizedBox(height: deviceHeight*0.01,),
         toolBarButton(
@@ -129,13 +136,6 @@ Widget toolBar({
         toolBarButton(
           onPressed: onPressedList[9],
           title: titles[9],
-          deviceWidth: deviceWidth,
-          activated: imageIsPGM != null && !imageIsPGM,
-        ),
-        SizedBox(height: deviceHeight*0.01,),
-        toolBarButton(
-          onPressed: onPressedList[10],
-          title: titles[10],
           deviceWidth: deviceWidth,
           activated: imageIsPGM != null && !imageIsPGM,
         ),

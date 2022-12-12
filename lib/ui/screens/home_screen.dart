@@ -69,6 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         contrastedImage = null;
         showHists = [true, false, false];
+        imgSeuille = null;
+        filteredImage = null;
         setState((){});
       }
     };
@@ -438,8 +440,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             deviceWidth: deviceWidth,
                             deviceHeight: deviceHeight,
                             imageIsPGM: image != null ? ( image.runtimeType == PGMImage ? true : false): null ,
-                            onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onFiltreHighBoostClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
-                            titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Filtre High-Boost", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
+                            onPressedList: [onFiltreMoyenneurClick, onFiltreMedianClick, onFiltreConvolutionClick, onModifyContrastClick, onSeuillageOtsuClick, onSeuillageManuelClick, onMorphologyClick("erosion"),onMorphologyClick("dilatation"),onMorphologyClick("ouverture"),onMorphologyClick("fermeture")],
+                            titles: ["Filtre Moyenneur", "Filtre Median", "Convolution", "Modifier contrast", "Seuillage Otsu","Seuillage Manuel", "Erosion", "Dilatation", "Ouverture", "Fermeture"]
                         ),
                       ),
 

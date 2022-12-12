@@ -430,7 +430,7 @@ class ImagesService {
     for(int row =0; row <img.lx; row++) {
       for (int col = 0; col < img.ly; col++) {
         int val = (img.mat[row][col] - imgFiltre.mat[row][col]);
-        img2.mat[row][col] = val < 0 ? 0 : val;
+        img2.mat[row][col] = val < 0 ? 0 : (val > img.maxValue ? img.maxValue : val);
       }
     }
     writePGM(img2, path);
@@ -618,7 +618,6 @@ class ImagesService {
         });
 
     await Future.delayed(const Duration(milliseconds: 200), () {});
-    print("hi");
     return image;
   }
 
